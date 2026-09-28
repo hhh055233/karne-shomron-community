@@ -1,0 +1,7 @@
+name = "karne-shomron-community"
+main = "worker.js"
+compatibility_date = "2026-09-28"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
