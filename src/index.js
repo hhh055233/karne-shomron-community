@@ -580,26 +580,375 @@ async function developerAi(req,env,u){
 async function board(req,env,u){
 
   const b=await body(req);
+  const msg=String(b.message||"").trim().slice(0,2000);
+  const normalized=msg.replace(/\s+/g," ").trim();
+  const approval=String(b.approvalPhrase||"").trim();
+  const taskId=String(b.taskId||"").trim();
 
-  const msg=String(
-    b.message||""
-  ).trim().slice(0,2000);
+  /* אישור */
+  if(normalized==="אישור" || approval==="אישור"){
 
-  const normalized=msg
-    .replace(/\s+/g," ")
-    .trim();
+    if(!u){
+      return json({
+        stage:"login_required",
+        reply:"כדי לבצע שינוי באתר צריך להתחבר כמנהל ראשי.",
+        needsApproval:false,
+        requiresAdmin:true
+      });
+    }
 
-  const approval=String(
-    b.approvalPhrase||""
-  ).trim();
+    if(u.role!=="super_admin"){
+      return json({
+        stage:"permission_required",
+        reply:"כדי לבצע שינוי באתר צריך הרשאת מנהל ראשי.",
+        needsApproval:false,
+        requiresAdmin:true
+      });
+    }
 
-  const taskId=String(
-    b.taskId||""
-  ).trim();
+    if(!taskId){
+      return json({
+        stage:"waiting",
+        reply:"אין כרגע משימה ממתינה לאישור.",
+        needsApproval:false
+      },409);
+    }
 
-  const plan=(steps)=>({steps});
+    const pending=await env.DB.prepare(
+      "SELECT id,message,plan_json,status,expires_at FROM board_tasks WHERE id=? AND user_id=? AND status='pending' AND expires_at>? LIMIT 1"
+    ).bind(taskId,u.id,Date.now()).first();
 
+    if(!pending){
+      return json({
+        stage:"expired",
+        reply:"המשימה פגה או שכבר בוצעה. שלח אותה מחדש.",
+        needsApproval:false
+      },409);
+    }
 
+    let p={};
+
+    try{
+      p=JSON.parse(pending.plan_json||"{}");
+    }catch{
+      p={};
+    }
+
+    let result=null;
+
+    if(p.kind==="add_category"){
+
+      const name=String(p.name||"").trim().slice(0,40);
+      const icon=String(p.icon||"🏷️").trim().slice(0,8);
+
+      if(!name){
+        return json({
+          stage:"blocked",
+          reply:"לא נמצא שם תקין לקטגוריה.",
+          needsApproval:false
+        },422);
+      }
+
+      const existing=await env.DB.prepare(
+        "SELECT name,icon,color FROM categories WHERE name=?"
+      ).bind(name).first();
+
+      if(existing){
+
+        result={
+          reply:`הקטגוריה "${name}" כבר קיימת.`,
+          action:"add_category",
+          category:[
+            existing.name,
+            existing.icon,
+            existing.color
+          ]
+        };
+
+      }else{
+
+        const palette=[
+          "#0ea5e9",
+          "#16a34a",
+          "#f59e0b",
+          "#8b5cf6",
+          "#ef4444",
+          "#0891b2"
+        ];
+
+        const count=await env.DB.prepare(
+          "SELECT COUNT(*) c FROM categories"
+        ).first();
+
+        const color=
+          palette[
+            Number(count?.c||0)%palette.length
+          ];
+
+        await env.DB.prepare(
+          "INSERT INTO categories(name,icon,color) VALUES(?,?,?)"
+        ).bind(name,icon,color).run();
+
+        result={
+          reply:`בוצע ✅ הוספתי את קטגוריית "${name}".`,
+          action:"add_category",
+          category:[
+            name,
+            icon,
+            color
+          ]
+        };
+      }
+
+    }else if(p.kind==="set_announcement"){
+
+      const announcement=String(
+        p.text||""
+      ).trim().slice(0,300);
+
+      await env.DB.prepare(
+        "INSERT INTO settings(key,value) VALUES('ann',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value"
+      ).bind(announcement).run();
+
+      result={
+        reply:"בוצע ✅ הודעת דף הבית עודכנה.",
+        action:"set_announcement",
+        announcement
+      };
+
+    }else if(p.kind==="diagnose"){
+
+      const [
+        a,
+        posts,
+        categories,
+        pendingCount
+      ]=await Promise.all([
+
+        env.DB.prepare(
+          "SELECT COUNT(*) c FROM users"
+        ).first(),
+
+        env.DB.prepare(
+          "SELECT COUNT(*) c FROM posts"
+        ).first(),
+
+        env.DB.prepare(
+          "SELECT COUNT(*) c FROM categories"
+        ).first(),
+
+        env.DB.prepare(
+          "SELECT COUNT(*) c FROM posts WHERE status='pending'"
+        ).first()
+      ]);
+
+      result={
+        reply:
+          `אבחון השרת הסתיים. משתמשים: ${a?.c||0}, מודעות: ${posts?.c||0}, קטגוריות: ${categories?.c||0}, מודעות ממתינות: ${pendingCount?.c||0}.`,
+        action:"diagnose"
+      };
+
+    }else{
+
+      await audit(
+        env,
+        u,
+        "board_blocked_execution",
+        pending.message
+      );
+
+      return json({
+        stage:"blocked",
+        reply:"המשימה הזו עדיין לא מחוברת לכלי ביצוע מורשה.",
+        needsApproval:false
+      },422);
+    }
+
+    await env.DB.prepare(
+      "UPDATE board_tasks SET status='executed' WHERE id=?"
+    ).bind(taskId).run();
+
+    await audit(
+      env,
+      u,
+      "board_execute",
+      JSON.stringify({
+        taskId,
+        kind:p.kind
+      })
+    );
+
+    return json({
+      ...result,
+      stage:"executed",
+      taskId,
+      needsApproval:false
+    });
+  }
+
+  /*
+   * משימות שהשרת יודע לבצע
+   */
+
+  let p=null;
+
+  const addMatch=msg.match(
+    /(?:תוסיף|הוסף|צור|פתח)\s+(?:קטגור(?:יה|יית)|קטגוריה)\s+["״']?([^"״'\n]+?)["״']?(?:\s+עם\s+(.+))?$/i
+  );
+
+  if(addMatch){
+
+    const name=String(
+      addMatch[1]||""
+    ).trim().slice(0,40);
+
+    if(name){
+
+      p={
+        kind:"add_category",
+        name,
+        icon:String(
+          addMatch[2]||"🏷️"
+        ).trim().slice(0,8),
+
+        steps:[
+          "בדיקת קיום הקטגוריה",
+          "הכנת השינוי",
+          "הצגת התוכנית",
+          "המתנה לאישור"
+        ]
+      };
+    }
+  }
+
+  const annMatch=msg.match(
+    /(?:שנה|עדכן|החלף)\s+(?:את\s+)?(?:הודעת\s+(?:דף\s*הבית|המערכת)|הודעה\s+ראשית)\s*(?:ל|:|-)\s*(.+)$/i
+  );
+
+  if(!p&&annMatch){
+
+    p={
+      kind:"set_announcement",
+
+      text:String(
+        annMatch[1]||""
+      ).trim().slice(0,300),
+
+      steps:[
+        "בדיקת הרשאת מנהל ראשי",
+        "הכנת עדכון הודעת המערכת",
+        "הצגת התוכנית",
+        "המתנה לאישור"
+      ]
+    };
+  }
+
+  if(
+    !p&&
+    /בדוק|אבחון|באג|תקלה|סטטוס/.test(msg)
+  ){
+
+    p={
+      kind:"diagnose",
+
+      steps:[
+        "בדיקת מסד הנתונים",
+        "בדיקת משתמשים ומודעות",
+        "בדיקת קטגוריות",
+        "הצגת התוכנית",
+        "המתנה לאישור"
+      ]
+    };
+  }
+
+  /*
+   * בקשה כללית:
+   * כאן לא נחזיר יותר את הודעת "אין כלי מורשה".
+   * במקום זאת נציג לבורד שהבקשה התקבלה,
+   * ובשלב הבא נחבר כאן את ה-AI.
+   */
+
+  if(!p){
+
+    return json({
+      stage:"chat",
+      reply:
+        `קיבלתי את הבקשה שלך:\n\n"${msg}"\n\nאני יכול לנתח אותה ולבנות עבורך תוכנית פעולה. כרגע פעולות שינוי אמיתיות נתמכות רק עבור הכלים המורשים של בורד.`,
+      needsApproval:false,
+      action:"chat"
+    });
+  }
+
+  /*
+   * אם אין משתמש מחובר:
+   * אפשר עדיין לדבר עם בורד ולראות תוכנית.
+   */
+
+  if(!u){
+
+    return json({
+      stage:"planned",
+      taskId:null,
+
+      reply:
+        "קיבלתי את המשימה והכנתי תוכנית. לא בוצע שום שינוי באתר. כדי לבצע שינוי בפועל צריך להתחבר כמנהל ראשי.",
+
+      action:"preview_change",
+      needsApproval:false,
+      requiresAdmin:true,
+      plan:{
+        steps:p.steps
+      }
+    });
+  }
+
+  /*
+   * משתמש מחובר:
+   * שומרים את המשימה וממתינים ל"אישור".
+   */
+
+  const id=crypto.randomUUID();
+  const expires=Date.now()+10*60*1000;
+
+  await env.DB.prepare(
+    "INSERT INTO board_tasks(id,user_id,message,plan_json,status,created_at,expires_at) VALUES(?,?,?,?,?,?,?)"
+  ).bind(
+    id,
+    u.id,
+    msg,
+    JSON.stringify(p),
+    "pending",
+    Date.now(),
+    expires
+  ).run();
+
+  await audit(
+    env,
+    u,
+    "board_plan",
+    JSON.stringify({
+      taskId:id,
+      kind:p.kind
+    })
+  );
+
+  return json({
+    stage:"planned",
+    taskId:id,
+
+    reply:
+      "קיבלתי את המשימה והכנתי תוכנית. עדיין לא בוצע שום שינוי. אם אתה רוצה לבצע את הפעולה, כתוב: אישור",
+
+    action:"preview_change",
+    needsApproval:true,
+
+    plan:{
+      steps:p.steps
+    },
+
+    expiresAt:expires
+  });
+}
   /* -----------------------------------------
      אישור פעולה
      מילת האישור היחידה: אישור
