@@ -1,0 +1,20 @@
+name = "karnei-shomron-two-ai"
+main = "src/index.js"
+compatibility_date = "2026-09-27"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "karnei-shomron"
+database_id = "ccef00ff-320d-4514-a517-dbce74c1fcb0"
+migrations_dir = "migrations"
+
+[vars]
+GITHUB_OWNER = "REPLACE_WITH_GITHUB_OWNER"
+GITHUB_REPO = "REPLACE_WITH_GITHUB_REPO"
+GITHUB_BRANCH = "main"
+BOARD_CODE_MODEL = "gpt-5.6-sol"
+BOARD_COMMIT_EMAIL = "board@users.noreply.github.com"
