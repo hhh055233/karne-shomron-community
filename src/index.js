@@ -1380,7 +1380,6 @@ async function board(req,env,u){
 
     expiresAt:expires
   });
-}
 
 
 /* =========================================================
