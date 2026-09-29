@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>קרני שומרון | הלוח הקהילתי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1e2440;--mut:#66708f;--line:#e3e7f2;--brand:#4f46e5;--brandInk:#fff;--shadow:0 2px 10px rgba(30,36,64,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12152a;--card:#1c2039;--ink:#eef0fb;--mut:#a4abc8;--line:#2b3052;--brand:#818cf8;--brandInk:#12152a;--shadow:0 2px 10px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#12152a;--card:#1c2039;--ink:#eef0fb;--mut:#a4abc8;--line:#2b3052;--brand:#818cf8;--brandInk:#12152a;--shadow:0 2px 10px rgba(0,0,0,.35)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Heebo',Arial,sans-serif;font-size:16px;line-height:1.55;min-height:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;max-width:1000px;margin:auto}
+.logo{font-weight:800;font-size:22px;color:var(--brand);cursor:pointer}
+.me{display:flex;align-items:center;gap:6px;font-size:14px;flex-wrap:wrap;justify-content:flex-end}
+.role{background:#fde68a;color:#78350f;border-radius:20px;padding:1px 10px;font-size:12px;font-weight:700}
+.btn{background:var(--brand);color:var(--brandInk);border-radius:12px;padding:10px 16px;font-weight:700;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;min-height:36px;font-size:14px}
+.btn.red{background:#ef4444;color:#fff}.btn.green{background:#16a34a;color:#fff}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 12px;max-width:1000px;margin:auto;scrollbar-width:none}
+.chip{flex:none;background:color-mix(in srgb,var(--c,var(--brand)) 13%,var(--card));color:var(--ink);border-radius:22px;padding:8px 14px;font-weight:500;min-height:40px;border:2px solid transparent}
+.chip.on{background:var(--c,var(--brand));color:#fff;font-weight:700}
+main{max-width:1000px;margin:auto;padding:16px 16px 110px}
+.hero{background:linear-gradient(135deg,#4f46e5,#ec4899 70%,#f97316);color:#fff;border-radius:22px;padding:24px 20px;margin-bottom:16px}
+.hero h1{margin:0 0 4px;font-size:26px;font-weight:800}.hero p{margin:0 0 14px;opacity:.95}
+.search{width:100%;padding:13px 16px;border-radius:14px;border:0;background:#fff;color:#1e2440;font-size:16px}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:700px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--c);color:#fff;border-radius:18px;padding:16px 10px;text-align:center;font-weight:700;font-size:17px;box-shadow:var(--shadow)}
+.tile span{display:block;font-size:30px;margin-bottom:2px}
+h2{font-size:20px;margin:6px 0 12px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border-inline-start:6px solid var(--c,var(--line))}
+.card h3{margin:2px 0 4px;font-size:18px}.card p{margin:0 0 8px;white-space:pre-wrap;word-break:break-word}
+.tag{display:inline-block;border-radius:20px;padding:2px 10px;font-size:13px;font-weight:500;margin:0 0 6px 6px;background:color-mix(in srgb,var(--c) 15%,var(--card))}
+.b1{background:#dbeafe;color:#1e40af}.b2{background:#dcfce7;color:#166534}.b3{background:#ffedd5;color:#9a3412}
+.meta{color:var(--mut);font-size:13px}
+.empty{text-align:center;padding:36px 16px;color:var(--mut)}.empty b{display:block;font-size:40px}
+.ads{display:flex;gap:10px;overflow-x:auto;margin-bottom:16px}
+.ad{flex:none;width:180px;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);text-decoration:none;color:var(--ink)}
+.ad img{width:100%;height:100px;object-fit:cover;display:block}.ad div{padding:8px;text-align:center;font-weight:700;font-size:14px}
+.fab{position:fixed;inset-inline-start:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:15;background:#f97316;color:#fff;border-radius:30px;padding:0 22px;height:54px;font-weight:800;font-size:17px;box-shadow:0 6px 18px rgba(249,115,22,.45)}
+footer{text-align:center;margin-top:24px}footer a{color:var(--mut);font-size:13px;cursor:pointer;text-decoration:underline}
+.modal{position:fixed;inset:0;background:rgba(10,12,30,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
+.modal.on{display:flex}
+.box{background:var(--card);border-radius:20px;padding:22px;width:440px;max-width:100%;max-height:90vh;overflow:auto}
+.box h3{margin:0 0 10px}
+.box input,.box textarea,.box select{width:100%;padding:12px;margin:5px 0;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.box .btn{width:100%;margin-top:8px}
+.extra{background:color-mix(in srgb,var(--brand) 8%,var(--card));border:1px dashed var(--brand);border-radius:12px;padding:10px;margin:8px 0;display:none}
+.lnk{background:none;color:var(--brand);text-decoration:underline;padding:8px 0;width:100%}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:#1e2440;color:#fff;border-radius:14px;padding:12px 20px;z-index:80;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90%;text-align:center}
+#toast.on{opacity:1}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
+.card.promo{box-shadow:0 0 0 2px #f59e0b,var(--shadow)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* AI revenue assistant */
+.ai-fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:16;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-radius:30px;padding:0 18px;height:54px;font-weight:800;font-size:16px;box-shadow:0 7px 22px rgba(79,70,229,.4)}
+.ai-box{width:520px}.ai-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.ai-chat{height:360px;overflow:auto;padding:8px 2px;display:flex;flex-direction:column;gap:8px}.ai-msg{max-width:88%;padding:10px 13px;border-radius:16px;white-space:pre-wrap}.ai-msg.bot{align-self:flex-start;background:color-mix(in srgb,var(--brand) 10%,var(--card))}.ai-msg.user{align-self:flex-end;background:var(--brand);color:var(--brandInk)}.ai-actions{display:flex;gap:7px;flex-wrap:wrap}.ai-actions button{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:7px 11px;cursor:pointer}.ai-lead{border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:5px;background:var(--bg)}
+@media(max-width:600px){.ai-box{width:100%}.ai-chat{height:46vh}.ai-fab{right:12px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}}
+
+/* ===== Technical AI Manager ===== */
+.tech-fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:16;background:linear-gradient(135deg,#111827,#374151);color:#fff;border-radius:30px;padding:0 17px;height:50px;font-weight:800;font-size:15px;box-shadow:0 7px 22px rgba(17,24,39,.35)}
+.tech-box{width:620px}
+.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+.tech-stat{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px}
+.tech-stat b{display:block;font-size:20px}
+.tech-log{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:8px;background:#0b1020;color:#dbeafe;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;direction:ltr;text-align:left}
+.tech-ok{color:#86efac}.tech-warn{color:#fde68a}.tech-bad{color:#fca5a5}
+.tech-actions{display:flex;gap:7px;flex-wrap:wrap}
+@media(max-width:600px){.tech-box{width:100%}.tech-grid{grid-template-columns:1fr}}
+
+
+/* ===== Dual AI assistants ===== */
+.ai-fab.service{right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));}
+.owner-fab{position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:16;background:linear-gradient(135deg,#0f766e,#0891b2);color:#fff;border-radius:30px;padding:0 18px;height:50px;font-weight:800;font-size:15px;box-shadow:0 7px 22px rgba(8,145,178,.35);display:none}
+.dual-box{width:560px}.dual-chat{height:360px;overflow:auto;padding:8px 2px;display:flex;flex-direction:column;gap:8px}
+.dual-msg{max-width:90%;padding:10px 13px;border-radius:16px;white-space:pre-wrap}.dual-msg.bot{align-self:flex-start;background:color-mix(in srgb,var(--brand) 10%,var(--card))}.dual-msg.user{align-self:flex-end;background:var(--brand);color:var(--brandInk)}
+.dual-msg.note{align-self:stretch;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;font-size:13px}
+.ai-tabs{display:flex;gap:7px;margin:10px 0}.ai-tabs button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px}.ai-tabs button.on{background:var(--brand);color:#fff}
+.owner-card{border:1px solid var(--line);border-radius:14px;padding:10px;margin:8px 0;background:var(--bg)}
+.owner-card b{display:block;margin-bottom:4px}
+@media(max-width:600px){.dual-box{width:100%}.dual-chat{height:46vh}.owner-fab{right:12px;bottom:calc(136px + env(safe-area-inset-bottom,0px));}.ai-fab.service{right:12px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}}
+
+/* ===== Personal AI Developer ===== */
+.devai-fab{position:fixed;right:16px;bottom:calc(82px + env(safe-area-inset-bottom,0px));z-index:17;background:linear-gradient(135deg,#111827,#2563eb);color:#fff;border-radius:30px;padding:0 18px;height:54px;font-weight:800;font-size:15px;box-shadow:0 7px 22px rgba(37,99,235,.35)}
+.devai-box{width:650px}
+.devai-chat{height:330px;overflow:auto;padding:8px 2px;display:flex;flex-direction:column;gap:8px}
+.devai-msg{max-width:92%;padding:10px 13px;border-radius:16px;white-space:pre-wrap;word-break:break-word}
+.devai-msg.bot{align-self:flex-start;background:color-mix(in srgb,var(--brand) 10%,var(--card))}
+.devai-msg.user{align-self:flex-end;background:var(--brand);color:var(--brandInk)}
+.devai-plan{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--bg);margin-top:6px}
+.devai-plan b{display:block;margin-bottom:4px}
+.devai-safe{font-size:12px;color:var(--mut);margin-top:7px}
+.devai-actions{display:flex;gap:7px;flex-wrap:wrap}
+.devai-actions button{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:7px 11px}
+.devai-status{font-size:12px;color:var(--mut);min-height:18px}
+@media(max-width:600px){.devai-box{width:100%}.devai-chat{height:46vh}.devai-fab{right:12px}}
+
+</style>
+<style id="board-ai-css">
+.board-ai-fab{position:fixed;left:18px;bottom:88px;z-index:9998;border:0;border-radius:999px;padding:13px 17px;background:#111827;color:#fff;font-weight:800;box-shadow:0 10px 30px #0003;cursor:pointer}
+.board-ai-modal{position:fixed;inset:0;background:#0007;z-index:9999;display:none;align-items:center;justify-content:center;padding:14px}
+.board-ai-modal.show{display:flex}.board-ai-box{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:18px;direction:rtl}
+.board-ai-head{display:flex;align-items:center;justify-content:space-between}.board-ai-chat{min-height:260px;max-height:48vh;overflow:auto;border:1px solid #e5e7eb;border-radius:16px;padding:12px;background:#f8fafc}
+.board-ai-msg{padding:10px 12px;border-radius:14px;margin:8px 0;white-space:pre-wrap}.board-ai-msg.bot{background:#fff;border:1px solid #e5e7eb}.board-ai-msg.user{background:#111827;color:#fff;margin-right:15%}
+.board-ai-input{display:flex;gap:8px;margin-top:10px}.board-ai-input textarea{flex:1;min-height:60px;resize:vertical;border:1px solid #cbd5e1;border-radius:12px;padding:10px}.board-ai-plan{margin-top:10px;border:1px dashed #94a3b8;border-radius:14px;padding:10px;background:#f8fafc}
+</style></head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo" onclick="go('home')">📋 קרני שומרון</div>
+    <div class="me"><span id="greet"></span><span class="role" id="role" hidden></span>
+      <button class="btn ghost sm" id="adminBtn" onclick="go('admin')" hidden>👑 ניהול</button>
+      <button class="btn ghost sm" id="themeBtn" onclick="theme()" aria-label="מצב תצוגה">🌓</button>
+      <button class="btn sm" id="authBtn" onclick="authBtn()">כניסה</button></div>
+  </div>
+  <nav class="chips" id="chips"></nav>
+</header>
+<main id="main"></main>
+<button class="fab" onclick="openPost()">➕ פרסם מודעה</button>
+<div id="toast" role="status"></div>
+<button class="ai-fab service" onclick="openServiceAI()">🤖 עוזר שירות</button>
+<button class="owner-fab" id="ownerFab" onclick="openOwnerAI()">🧠 העוזר שלי</button>
+
+<div class="modal" id="m-service"><div class="box dual-box">
+  <div class="ai-head"><div><h3 style="margin-bottom:2px">🤖 עוזר השירות</h3><small style="color:var(--mut)">עוזר למשתמשים למצוא מידע, שירותים ועסקים בלוח</small></div><button class="btn ghost sm" onclick="shut('service')">✕</button></div>
+  <div id="serviceChat" class="dual-chat"></div>
+  <div class="ai-actions" id="serviceQuick"></div>
+  <div class="row"><input id="serviceInput" placeholder="למשל: אני מחפש אינסטלטור" onkeydown="if(event.key==='Enter')serviceSend()"><button class="btn sm" onclick="serviceSend()">שלח</button></div>
+</div></div>
+
+<div class="modal" id="m-owner"><div class="box dual-box">
+  <div class="ai-head"><div><h3 style="margin-bottom:2px">🧠 העוזר האישי שלך</h3><small style="color:var(--mut)">עוזר לך לנהל פניות, עמודים, תמחור והסברים על תשלום</small></div><button class="btn ghost sm" onclick="shut('owner')">✕</button></div>
+  <div id="ownerChat" class="dual-chat"></div>
+  <div class="ai-actions" id="ownerQuick"></div>
+  <div class="row"><input id="ownerInput" placeholder="כתוב לי מה אתה רוצה שאעשה" onkeydown="if(event.key==='Enter')ownerSend()"><button class="btn sm" onclick="ownerSend()">שלח</button></div>
+  <div class="owner-card"><b>🔐 מצב אבטחה</b>בפרסום אמיתי יש להשתמש בשרת מאובטח. פרטי תשלום לא נשמרים בצד הלקוח ולא מזינים כאן סיסמאות, קודי SMS או פרטי התחברות לבנק.</div>
+  <div class="owner-card"><b>💳 תשלומים</b>העוזר יכול להסביר ללקוח איך לבצע העברה בנקאית לפי פרטי תשלום ציבוריים שהוגדרו בשרת. הוא לא מבקש סיסמת בנק, קוד אימות או גישה לחשבון, ולא מבצע העברה בעצמו.</div>
+  <div class="owner-card"><b>🌐 עמוד עסקי</b>העוזר יכול לאסוף דרישות לעמוד, להכין מפרט והצעת מחיר, ולשמור פנייה להמשך טיפול. תשלום חודשי בפועל צריך להתבצע דרך מערכת תשלומים מאובטחת ולא דרך הצ'אט.</div>
+</div></div>
+
+
+
+<button class="tech-fab" id="techFab" onclick="openTechManager()" hidden>🛠️ מנהל טכני AI</button>
+
+<div class="modal" id="m-tech"><div class="box tech-box">
+  <div class="ai-head">
+    <div>
+      <h3 style="margin-bottom:2px">🛠️ מנהל טכני AI</h3>
+      <small style="color:var(--mut)">אבחון, ניטור ותחזוקה — עם הרשאות מוגבלות</small>
+    </div>
+    <button class="btn ghost sm" onclick="shut('tech')">✕</button>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-stat"><span>שרת</span><b id="techServer">בודק...</b></div>
+    <div class="tech-stat"><span>סשן</span><b id="techSession">בודק...</b></div>
+    <div class="tech-stat"><span>מודעות</span><b id="techPosts">—</b></div>
+    <div class="tech-stat"><span>אחסון מקומי</span><b id="techStorage">בודק...</b></div>
+  </div>
+  <div class="tech-actions">
+    <button class="btn sm" onclick="techDiagnose()">🔍 אבחון מלא</button>
+    <button class="btn ghost sm" onclick="techSync()">🔄 סנכרון</button>
+    <button class="btn ghost sm" onclick="techHealth()">❤️ בדיקת שרת</button>
+  </div>
+  <h4>יומן טכני</h4>
+  <div id="techLog" class="tech-log">ממתין לבדיקה...</div>
+  <div class="row">
+    <input id="techInput" placeholder="שאל את המנהל הטכני, למשל: בדוק למה הסנכרון נכשל" maxlength="500">
+    <button class="btn sm" onclick="techAsk()">שאל</button>
+  </div>
+  <small id="techSafetyNote" style="display:block;margin-top:8px;color:var(--mut)">
+    במצב ללא שרת, המנהל הטכני יכול לבצע אבחון מקומי בלבד. פעולות מסוכנות כמו מחיקה, שינוי הרשאות או שינוי קוד אינן מבוצעות אוטומטית.
+  </small>
+</div></div>
+
+<div class="modal" id="m-auth"><div class="box">
+  <h3 id="authT">כניסת מנהלים</h3>
+  <p style="margin:0 0 8px;color:var(--mut)">כניסת מנהלים מתבצעת באמצעות קוד מנהל בלבד.</p>
+  <input id="aCode" type="password" placeholder="קוד מנהל" autocomplete="off" inputmode="text" dir="ltr" onkeydown="if(event.key==='Enter')authGo()">
+  <button class="btn" id="authGo" onclick="authGo()">כניסה</button>
+  <button class="btn ghost" onclick="shut('auth')">סגור</button>
+</div></div>
+
+<div class="modal" id="m-post"><div class="box">
+  <h3>פרסום מודעה חדשה</h3>
+  <select id="pC" onchange="extra()"></select>
+  <input id="pT" placeholder="כותרת המודעה">
+  <textarea id="pD" placeholder="תיאור" rows="3"></textarea>
+  <input id="pP" placeholder="טלפון ליצירת קשר (לא חובה)" inputmode="tel" dir="ltr">
+  <div class="extra" id="extra">
+    <b id="exT"></b>
+    <input id="pA"><input id="pS"><input id="pL">
+  </div>
+  <button class="btn" onclick="submitPost()">שלח לאישור</button>
+  <button class="btn ghost" onclick="shut('post')">ביטול</button>
+</div></div>
+
+<div class="modal" id="m-ad"><div class="box">
+  <h3>הוספת פרסומת</h3>
+  <input id="adF" type="file" accept="image/*">
+  <input id="adL" placeholder="קישור (https://...)" dir="ltr">
+  <input id="adX" placeholder="טקסט קצר">
+  <button class="btn" onclick="saveAd()">שמור</button>
+  <button class="btn ghost" onclick="shut('ad')">ביטול</button>
+</div></div>
+
+<div class="modal" id="m-prop"><div class="box">
+  <h3>💡 הצעת קטגוריה</h3>
+  <textarea id="prT" rows="3" placeholder="איזו קטגוריה חסרה לך?"></textarea>
+  <button class="btn" onclick="sendProp()">שלח</button>
+  <button class="btn ghost" onclick="shut('prop')">ביטול</button>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const BASE=[['דרושים','💼','#3b82f6'],['חנויות','🏪','#8b5cf6'],['חוגים','🎨','#f97316'],['אירועים','🎉','#ec4899'],['יד2','📦','#0d9488'],['חדשות','📰','#ef4444'],['למסירה','🎁','#16a34a'],['נדל"ן','🏠','#0ea5e9'],['שירותים','🔧','#ca8a04'],['התנדבות','🤝','#0891b2'],['קהילה','💬','#7c3aed']];
+const ROLES={user:'',manager:'מנהל',super_manager:'מנהל בכיר',super_admin:'מנהל ראשי'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){console.warn('Storage read failed:',k);return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){console.warn('Storage write failed:',k,e);toast('לא הצלחתי לשמור. ייתכן שהאחסון מלא.');return false}};
+const XC=['#0ea5e9','#a855f7','#eab308','#f43f5e','#22c55e','#6366f1'];
+let CATS=BASE.concat(ld('C3',[]));
+let cur=ld('CUR3',null),view='home',q='',mode='login';
+const users=()=>ld('U3',{}),posts=()=>ld('P3',[]);
+let serverSession=ld('LUACH_SESSION',null);
+const role=()=>{const r=serverSession?.role || (cur&&users()[cur]&&users()[cur].role);return ['manager','super_manager','super_admin'].includes(r)?r:'user'};
+const isMgr=()=>['manager','super_manager','super_admin'].includes(role());
+const hasAdmin=()=>SERVER_CONFIG?.enabled ? true : Object.values(users()).some(u=>u.role!=='user');
+const ci=n=>CATS.findIndex(c=>c[0]===n);
+const cs=i=>`style="--c:${CATS[i][2]}"`;
+const open=id=>$('m-'+id).classList.add('on'),shut=id=>$('m-'+id).classList.remove('on');
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
+let tt;function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2600)}
+function theme(){const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'}
+async function hash(u,p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(u+':luach:'+p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa(unescape(encodeURIComponent(u+p)))}}
+
+function go(v){view=v;q='';render();scrollTo(0,0)}
+function card(p){const i=ci(p.cat);let t='';
+  if(p.age)t+=`<span class="tag b1">👥 ${esc(p.age)}</span>`;if(p.salary)t+=`<span class="tag b2">💰 ${esc(p.salary)}</span>`;if(p.location)t+=`<span class="tag b3">📍 ${esc(p.location)}</span>`;
+  const del=isMgr()?`<button class="btn red sm" onclick="delPost(${JSON.stringify(String(p.id))})">🗑️ מחק</button>`+(canCat()?`<button class="btn ghost sm" onclick="promo(${JSON.stringify(String(p.id))})">${p.promo?'בטל קידום':'⭐ קדם'}</button>`:''):'';
+  const ph=String(p.phone||'').replace(/[^\d+]/g,'');
+  const acts=`<div class="row">${ph?`<a class="btn sm" href="tel:${ph}">📞 התקשר</a><a class="btn green sm" target="_blank" rel="noopener" href="https://wa.me/${waNum(ph)}">💬 וואטסאפ</a>`:''}<button class="btn ghost sm" onclick="share(${JSON.stringify(String(p.id))})">↗ שתף</button>${del}</div>`;
+  return `<div class="card${p.promo?' promo':''}" ${cs(i)}>${p.promo?'<span class="tag" style="background:#fde68a;color:#78350f">⭐ מקודם</span>':''}<span class="tag">${CATS[i][1]} ${esc(p.cat)}</span><h3>${esc(p.title)}</h3><p>${esc(p.desc)}</p><div>${t}</div><div class="meta">פורסם על ידי ${esc(p.author)} · ${esc(p.date)}</div>${acts}</div>`}
+function list(arr,name){const needle=String(q||'').trim().slice(0,100).toLocaleLowerCase();const f=needle?arr.filter(p=>(String(p.title||'')+' '+String(p.desc||'')+' '+String(p.location||'')).toLocaleLowerCase().includes(needle)):arr;
+  if(!f.length)return `<div class="empty"><b>${q?'🔍':'🌱'}</b>${q?'לא נמצאו מודעות שמתאימות לחיפוש.':'עדיין אין מודעות ב'+esc(name)+'. אפשר להיות הראשונים!'}</div>`;
+  const A=ld('A3',[]);return f.map((p,k)=>card(p)+(A.length&&k%4===3?spons(A[(k>>2)%A.length]):'')).join('')}
+function adsHtml(){const a=ld('A3',[]);if(!a.length)return '';return '<div class="ads">'+a.map(x=>`<a class="ad" href="${/^https?:\/\//.test(x.link)?esc(x.link):'#'}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt=""><div>${esc(x.txt)}</div></a>`).join('')+'</div>'}
+function searchBox(){return `<input class="search" style="margin-bottom:14px;border:1px solid var(--line);background:var(--card);color:var(--ink)" placeholder="🔍 חיפוש מודעות" value="${esc(q)}" oninput="q=this.value;renderList()">`}
+function renderList(){const el=$('list');if(!el)return;const source=sharedPosts();const ap=source.filter(p=>p.status==='approved').reverse().sort((a,b)=>(b.promo?1:0)-(a.promo?1:0));el.innerHTML=view==='home'?list(ap,'הלוח'):list(ap.filter(p=>p.cat===CATS[view][0]),CATS[view][0])}
+function render(){
+  $('greet').textContent=cur?'שלום '+cur:'';const r=role();$('role').hidden=r==='user'||!cur;$('role').textContent=ROLES[r];
+  $('adminBtn').hidden=!isMgr();if($('ownerFab'))$('ownerFab').style.display=isMgr()?'block':'none';if($('techFab'))$('techFab').hidden=!canUseTech();$('authBtn').textContent=cur?'התנתק':'כניסה / הרשמה';
+  $('chips').innerHTML=`<button class="chip ${view==='home'?'on':''}" onclick="go('home')">🏠 הכול</button>`+CATS.map((c,i)=>`<button class="chip ${view===i?'on':''}" ${cs(i)} onclick="go(${i})">${c[1]} ${c[0]}</button>`).join('');
+  let h='';
+  if(view==='home'){h=annHtml()+`<div class="hero"><h1>קרני שומרון: הכול במקום אחד</h1><p>דרושים, עסקים, חוגים, אירועים וחדשות של היישוב שלנו.</p><div class="row" style="margin:0 0 12px"><button class="btn" style="background:#fff;color:#1e2440" onclick="shareSite()">↗ שתפו בוואטסאפ</button></div><input class="search" placeholder="🔍 חיפוש מודעות" oninput="q=this.value;renderList()"></div>
+    <div class="tiles">${CATS.map((c,i)=>`<button class="tile" ${cs(i)} onclick="go(${i})"><span>${c[1]}</span>${c[0]}</button>`).join('')}<button class="tile" style="--c:#64748b" onclick="openProp()"><span>💡</span>הצע קטגוריה</button></div>${adsHtml()}<h2>מודעות אחרונות</h2><div id="list"></div>${ctaHtml()}`}
+  else if(view==='admin'&&isMgr())h=adminHtml();
+  else if(typeof view==='number'){h=`<h2 style="color:${CATS[view][2]}">${CATS[view][1]} ${CATS[view][0]}</h2>${searchBox()}${adsHtml()}<div id="list"></div>`}
+  else{view='home';return render()}
+  h+=`<footer>${hasAdmin()?'<a onclick="openAuth(\'login\')">כניסת מנהלים</a>':'<a onclick="openAuth(\'setup\')">הגדרת מנהל ראשי (פעם ראשונה)</a>'}</footer>`;
+  $('main').innerHTML=h;renderList()}
+
+function openAuth(m){mode=m;$('authT').textContent={login:'כניסה',reg:'הרשמה',setup:'הגדרת מנהל ראשי'}[m];$('authGo').textContent={login:'התחבר',reg:'הירשם',setup:'צור מנהל ראשי'}[m];$('authSw').textContent=m==='login'?'אין חשבון? הרשמה':'יש חשבון? כניסה';$('authSw').hidden=m==='setup';$('aU').value=$('aP').value='';open('auth')}
+async function authBtn(){if(cur){try{if(SERVER_CONFIG.enabled&&serverSession?.token)await api('/api/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+serverSession.token}})}catch(e){}serverSession=null;sv('LUACH_SESSION',null);cur=null;sv('CUR3',null);view='home';render();toast('התנתקת בהצלחה')}else openAuth('login')}
+async function authGo(){const u=$('aU').value.trim(),p=$('aP').value;
+  if(u.length<2||p.length<(mode==='setup'?8:6))return toast('שם משתמש של 2 תווים ומעלה וסיסמה של 6 תווים ומעלה (8 למנהל ראשי)');
+  if(['__proto__','constructor','prototype'].includes(u.toLowerCase()))return toast('השם הזה לא מותר');
+  if(SERVER_CONFIG.enabled){
+    try{
+      const path=mode==='setup'?'/api/auth/setup':mode==='reg'?'/api/auth/register':'/api/auth/login';
+      const data=await api(path,{method:'POST',body:JSON.stringify({username:u,password:p})});
+      if(!data.token)throw new Error('missing token');
+      serverSession={token:data.token,username:data.user.username,role:data.user.role};sv('LUACH_SESSION',serverSession);cur=data.user.username;sv('CUR3',cur);shut('auth');render();await syncPosts();toast('שלום '+cur+', טוב לראות אותך!');return;
+    }catch(e){return toast(e.status===409?'שם המשתמש כבר תפוס':e.status===429?'יותר מדי ניסיונות. נסה שוב מאוחר יותר':e.status===403?'כבר קיים מנהל ראשי':'ההתחברות נכשלה')}
+  }
+  const U=users(),h=await hash(u,p);
+  if(mode==='login'){const L=ld('L3',{}),l=L[u]||{n:0,t:0};if(l.t>Date.now())return toast('יותר מדי ניסיונות. אפשר לנסות שוב בעוד '+Math.ceil((l.t-Date.now())/60000)+' דקות');if(!(Object.prototype.hasOwnProperty.call(U,u)&&U[u].h===h)){l.n++;if(l.n>=5){l.t=Date.now()+300000;l.n=0}L[u]=l;sv('L3',L);return toast('שם המשתמש או הסיסמה לא נכונים')}delete L[u];sv('L3',L)}else{if(Object.prototype.hasOwnProperty.call(U,u))return toast('השם הזה כבר תפוס');if(mode==='setup'&&hasAdmin())return toast('כבר קיים מנהל ראשי');U[u]={h,role:mode==='setup'?'super_admin':'user'};sv('U3',U)}cur=u;sv('CUR3',u);shut('auth');render();toast('שלום '+u+', טוב לראות אותך!')}
+
+function exFields(c){return c==='דרושים'?['💼 פרטי המשרה','גילאים, למשל 22-35','שכר, למשל 8000₪ או 50₪ לשעה','איפה העבודה, למשל תל אביב או מהבית']:['🎨 פרטי החוג','לגילאים, למשל 5-12 או נוער','עלות, למשל 250₪ לחודש','איפה החוג, למשל מתנ"ס']}
+function extra(){const c=$('pC').value,on=c==='דרושים'||c==='חוגים';$('extra').style.display=on?'block':'none';if(on){const f=exFields(c);$('exT').textContent=f[0];$('pA').placeholder=f[1];$('pS').placeholder=f[2];$('pL').placeholder=f[3]}}
+function openPost(c){if(!cur){toast('כדי לפרסם צריך להתחבר');return openAuth('login')}
+  if(posts().some(p=>p.author===cur&&p.status==='pending'))return toast('יש לך כבר מודעה שממתינה לאישור');
+  $('pC').innerHTML=CATS.map(x=>`<option>${x[0]}</option>`).join('');
+  $('pC').value=typeof view==='number'?CATS[view][0]:CATS[0][0];
+  ['pT','pD','pP','pA','pS','pL'].forEach(k=>$(k).value='');extra();open('post')}
+function submitPost(){const g=k=>$(k).value.trim(),cat=$('pC').value;
+  if(!cur||(!users()[cur]&&!serverSession?.token))return toast('צריך להתחבר מחדש כדי לפרסם');
+  if(!g('pT')||!g('pD'))return toast('חסרים כותרת ותיאור');
+  if(g('pT').length>100||g('pD').length>3000||g('pP').length>30||g('pA').length>60||g('pS').length>60||g('pL').length>120)return toast('אחד השדות ארוך מדי');
+  if((cat==='דרושים'||cat==='חוגים')&&(!g('pA')||!g('pS')||!g('pL')))return toast('בדרושים ובחוגים צריך למלא גילאים, שכר או עלות, ומיקום');
+  const P=posts();P.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),cat,title:g('pT'),desc:g('pD'),age:g('pA'),salary:g('pS'),location:g('pL'),phone:g('pP').replace(/[^\d+]/g,''),author:cur,status:'pending',date:new Date().toLocaleDateString('he-IL')});
+  const item=P[P.length-1];sv('P3',P);if(SERVER_CONFIG.enabled)api('/api/posts',{method:'POST',body:JSON.stringify(item)}).then(syncPosts).catch(e=>console.warn(e));shut('post');render();toast('המודעה נשלחה לאישור ותופיע אחרי שמנהל יאשר אותה')}
+function delPost(id){if(!isMgr()||!confirm('למחוק את המודעה?'))return;sv('P3',sharedPosts().filter(p=>String(p.id)!==String(id)));if(SERVER_CONFIG.enabled)api('/api/posts/'+encodeURIComponent(id),{method:'DELETE'}).then(syncPosts).catch(e=>console.warn(e));render();toast('המודעה נמחקה')}
+function setStatus(id,ok){if(!isMgr())return;const P=sharedPosts();if(ok){const p=P.find(x=>String(x.id)===String(id));if(p)p.status='approved';sv('P3',P);if(SERVER_CONFIG.enabled)api('/api/posts/'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'approved'})}).then(syncPosts).catch(e=>console.warn(e));toast('המודעה אושרה')}else{sv('P3',P.filter(p=>String(p.id)!==String(id)));if(SERVER_CONFIG.enabled)api('/api/posts/'+encodeURIComponent(id),{method:'DELETE'}).then(syncPosts).catch(e=>console.warn(e));toast('המודעה נמחקה')}render()}
+
+function openProp(){if(!cur){toast('כדי להציע קטגוריה צריך להתחבר');return openAuth('login')}$('prT').value='';open('prop')}
+function sendProp(){const t=$('prT').value.trim();if(!t)return toast('כתוב את ההצעה שלך');const I=ld('I3',[]);I.push({id:Date.now(),from:cur,text:t});sv('I3',I);shut('prop');toast('תודה! ההצעה נשלחה')}
+
+const waNum=n=>{n=String(n).replace(/[^\d]/g,'');return n.startsWith('0')?'972'+n.slice(1):n};
+function shareText(t){try{if(navigator.share){navigator.share({text:t}).catch(()=>{});return}}catch(e){}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
+function share(id){const p=sharedPosts().find(x=>String(x.id)===String(id));if(p)shareText(p.title+' | '+p.cat+' בקרני שומרון\n'+location.href)}
+const shareSite=()=>shareText('הלוח הקהילתי של קרני שומרון: דרושים, חוגים, אירועים ועוד\n'+location.href);
+function promo(id){if(!canCat())return toast('רק מנהל בכיר או ראשי יכולים לקדם מודעות');const P=sharedPosts(),p=P.find(x=>String(x.id)===String(id));if(!p)return;p.promo=!p.promo;sv('P3',P);render();if(SERVER_CONFIG.enabled){api('/api/posts/'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({promo:!!p.promo})}).then(syncPosts).catch(e=>console.warn(e));}toast(p.promo?'המודעה מקודמת ותופיע ראשונה':'הקידום בוטל')}
+const annHtml=()=>{const S=ld('S3',{});return S.ann?`<div class="card" style="--c:#f59e0b;background:color-mix(in srgb,#f59e0b 14%,var(--card))"><b>📢 הודעה מהיישוב</b><p style="margin:4px 0 0">${esc(S.ann)}</p></div>`:''};
+const ctaHtml=()=>`<div class="hero" style="margin-top:20px;background:linear-gradient(135deg,#0d9488,#4f46e5)"><h1 style="font-size:22px">יש לכם עסק בקרני שומרון?</h1><p>פרסמו אצלנו ותגיעו ישירות לתושבי היישוב והסביבה: מודעה מקודמת, באנר בדף הבית או פרסום ממומן בין המודעות.</p><button class="btn" style="background:#fff;color:#1e2440" onclick="adContact()">💬 דברו איתנו בוואטסאפ</button></div>`;
+function adContact(){const S=ld('S3',{});if(!S.wa)return toast('פרטי הקשר לפרסום יתווספו בקרוב');window.open('https://wa.me/'+waNum(S.wa)+'?text='+encodeURIComponent('שלום, אני מעוניין לפרסם בלוח של קרני שומרון'),'_blank')}
+function saveS(){if(!canCat())return toast('אין הרשאה');const S=ld('S3',{});S.ann=$('sAnn').value.trim();if($('sWa')&&role()==='super_admin')S.wa=$('sWa').value.replace(/[^\d+]/g,'');sv('S3',S);toast('ההגדרות נשמרו')}
+const spons=a=>`<a class="card" style="--c:#f59e0b;display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink)" href="${/^https?:\/\//.test(a.link)?esc(a.link):'#'}" target="_blank" rel="noopener"><img src="${esc(a.img)}" alt="" style="width:96px;height:72px;object-fit:cover;border-radius:10px;flex:none"><div><span class="meta">ממומן</span><br><b>${esc(a.txt)}</b></div></a>`;
+const canCat=()=>role()==='super_manager'||role()==='super_admin';
+function okProp(id){if(!canCat())return toast('רק מנהל בכיר או ראשי יכולים לאשר קטגוריות');
+  const cl=s=>s.replace(/[<>&"'`]/g,'').trim(),n=cl($('ce'+id).value),e=cl($('cm'+id).value)||'🏷️';
+  if(!n)return toast('צריך שם לקטגוריה');if(CATS.some(c=>c[0]===n))return toast('קטגוריה בשם הזה כבר קיימת');
+  const X=ld('C3',[]);X.push([n,e,XC[X.length%XC.length]]);sv('C3',X);CATS=BASE.concat(X);
+  sv('I3',ld('I3',[]).filter(x=>x.id!==id));render();toast('הקטגוריה "'+n+'" נוספה לאתר')}
+function noProp(id){if(!canCat())return toast('רק מנהל בכיר או ראשי יכולים לדחות הצעות');sv('I3',ld('I3',[]).filter(x=>x.id!==id));render();toast('ההצעה נדחתה')}
+function adminHtml(){const r=role(),pend=sharedPosts().filter(p=>p.status==='pending'),I=ld('I3',[]),A=ld('A3',[]);
+  let h='<h2>👑 פאנל ניהול</h2><h3>⏳ מודעות לאישור</h3>';
+  h+=pend.length?pend.map(p=>card(p).replace(/<button class="btn red[^]*?<\/button>/,'')+`<div class="row" style="margin:-4px 0 14px"><button class="btn green sm" onclick="setStatus(${JSON.stringify(String(p.id))},true)">✔ אשר</button><button class="btn red sm" onclick="setStatus(${JSON.stringify(String(p.id))},false)">✖ מחק</button></div>`).join(''):'<div class="empty"><b>✅</b>אין מודעות שממתינות</div>';
+  if(r==='super_manager'||r==='super_admin'){const fi='padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)';
+    h+='<h3>💡 הצעות קטגוריות</h3>'+(I.length?I.map(x=>`<div class="card"><b>${esc(x.from)}:</b> ${esc(x.text)}<div class="row"><input id="ce${x.id}" value="${esc(String(x.text).slice(0,20))}" maxlength="20" style="flex:1;min-width:120px;${fi}"><input id="cm${x.id}" value="🏷️" maxlength="4" style="width:64px;text-align:center;${fi}"></div><div class="row"><button class="btn green sm" onclick="okProp(${x.id})">✔ אשר והוסף</button><button class="btn red sm" onclick="noProp(${x.id})">✖ דחה</button></div></div>`).join(''):'<div class="empty">אין הצעות</div>')}
+  if(r==='super_manager'||r==='super_admin'){const opts=Object.keys(users()).map(n=>`<option>${esc(n)}</option>`).join('');
+    const S=ld('S3',{}),f2='padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)';
+    h+=`<h3>⚙️ הגדרות האתר</h3><div class="card"><textarea id="sAnn" rows="2" maxlength="300" placeholder="הודעה לראש דף הבית (למשל הודעה מהיישוב)" style="width:100%;${f2}">${esc(S.ann||'')}</textarea>${r==='super_admin'?`<input id="sWa" dir="ltr" placeholder="וואטסאפ לפניות פרסום, למשל 0501234567" value="${esc(S.wa||'')}" style="width:100%;margin-top:8px;${f2}">`:''}<button class="btn sm" style="margin-top:8px" onclick="saveS()">שמור הגדרות</button></div>`;
+    h+=`<h3>מינוי מנהלים</h3><div class="card"><select id="tU" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)">${opts}</select><div class="row"><button class="btn sm" onclick="setRole('manager')">מנהל</button><button class="btn sm" onclick="setRole('super_manager')">מנהל בכיר</button>${r==='super_admin'?'<button class="btn sm" onclick="setRole(\'super_admin\')">מנהל ראשי</button>':''}<button class="btn ghost sm" onclick="setRole('user')">הסר הרשאות</button></div></div>`}
+  if(r==='super_admin')h+=`<h3>📣 פרסומות</h3><button class="btn sm" onclick="open('ad')">➕ הוסף פרסומת</button><div style="margin-top:10px">${A.map(a=>`<div class="card">${esc(a.txt)} <button class="btn red sm" onclick="delAd(${a.id})">מחק</button></div>`).join('')}</div>`;
+  return h}
+async function setRole(nr){const r=role();if(SERVER_CONFIG.enabled){if(!['super_manager','super_admin'].includes(r))return toast('אין לך הרשאה');const t=$('tU').value;try{await api('/api/admin/users/'+encodeURIComponent(t),{method:'PATCH',body:JSON.stringify({role:nr})});toast('ההרשאה עודכנה בשרת');return}catch(e){return toast(e.status===403?'אין לך הרשאה לשינוי הזה':'לא הצלחתי לעדכן את ההרשאה')}}if(nr==='super_admin'&&r!=='super_admin')return toast('רק מנהל ראשי יכול למנות מנהל ראשי');if(r==='user'||r==='manager')return toast('אין לך הרשאה');
+  const t=$('tU').value,U=users();if(!U[t])return toast('המשתמש לא נמצא');
+  if(U[t].role==='super_admin'){if(r!=='super_admin')return toast('רק מנהל ראשי יכול לשנות הרשאות של מנהל ראשי');
+    if(nr!=='super_admin'&&Object.values(U).filter(x=>x.role==='super_admin').length<2)return toast('אי אפשר להסיר את המנהל הראשי האחרון')}
+  U[t].role=nr;sv('U3',U);toast('ההרשאה עודכנה')}
+function saveAd(){if(role()!=='super_admin')return toast('רק מנהל ראשי יכול להוסיף פרסומות');
+  const f=$('adF').files[0],link=$('adL').value.trim(),txt=$('adX').value.trim();if(!f||!txt)return toast('צריך תמונה וטקסט');if(!f.type.startsWith('image/'))return toast('יש לבחור קובץ תמונה');if(f.size>5*1024*1024)return toast('התמונה גדולה מדי (עד 5MB)');if(link&&!/^https:\/\//i.test(link))return toast('קישור לפרסומת חייב להתחיל ב-https://');if(txt.length>160)return toast('טקסט הפרסומת ארוך מדי');
+  const img=new Image(),fr=new FileReader();fr.onload=()=>{img.onload=()=>{const c=document.createElement('canvas'),s=Math.min(1,400/img.width);c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    const A=ld('A3',[]);A.push({id:Date.now(),img:c.toDataURL('image/jpeg',.7),link,txt});sv('A3',A);shut('ad');render();toast('הפרסומת נוספה')};img.src=fr.result};fr.readAsDataURL(f)}
+function delAd(id){if(role()!=='super_admin')return toast('רק מנהל ראשי יכול למחוק פרסומות');if(!confirm('למחוק את הפרסומת?'))return;sv('A3',ld('A3',[]).filter(a=>a.id!==id));render()}
+
+/* ===== Technical AI Manager ===== */
+const TECH_CONFIG={health:'/api/health',diagnose:'/api/ai/tech/diagnose',ask:'/api/ai/tech'};
+const canUseTech=()=>role()==='super_manager'||role()==='super_admin';
+function techLog(msg,kind=''){
+  const e=$('techLog');if(!e)return;
+  const line=document.createElement('div');line.className=kind?'tech-'+kind:'';line.textContent='['+new Date().toLocaleTimeString('he-IL')+'] '+String(msg);e.appendChild(line);e.scrollTop=e.scrollHeight;
+}
+function openTechManager(){if(!canUseTech())return toast('אין הרשאה למנהל הטכני');open('tech');techRefresh()}
+async function techRefresh(){
+  $('techSession').textContent=serverSession?.token?'מחובר':'לא מחובר';
+  $('techPosts').textContent=String(sharedPosts().length);
+  try{
+    const bytes=new Blob(Object.keys(localStorage).map(k=>localStorage.getItem(k)||'')).size;
+    $('techStorage').textContent=(bytes/1024).toFixed(1)+' KB';
+  }catch(e){$('techStorage').textContent='לא זמין'}
+  await techHealth();
+  const note=$('techSafetyNote');if(note)note.textContent=SERVER_CONFIG.enabled?'פעולות מסוכנות כמו מחיקה, שינוי הרשאות או שינוי קוד אינן מבוצעות אוטומטית.':'מצב ללא שרת: אבחון מקומי בלבד. פעולות מסוכנות כמו מחיקה, שינוי הרשאות או שינוי קוד אינן מבוצעות אוטומטית.';
+}
+async function techHealth(){
+  if(!canUseTech())return;
+  if(!SERVER_CONFIG.enabled){$('techServer').textContent='מצב מקומי';techLog('השרת כבוי במצב הזה','warn');return}
+  try{const d=await api(TECH_CONFIG.health);$('techServer').textContent=d.status==='ok'?'תקין':'תגובה התקבלה';techLog('בדיקת שרת הסתיימה','ok')}
+  catch(e){$('techServer').textContent='לא זמין';techLog('בדיקת שרת נכשלה: '+e.message,'bad')}
+}
+async function techSync(){
+  if(!canUseTech())return;
+  techLog('מתחיל סנכרון...');
+  await syncSession();await syncPosts();
+  $('techPosts').textContent=String(sharedPosts().length);$('techSession').textContent=serverSession?.token?'מחובר':'לא מחובר';
+  techLog('הסנכרון הסתיים','ok');toast('הסנכרון הסתיים')
+}
+async function techDiagnose(){
+  if(!canUseTech())return;
+  techLog('מריץ אבחון מקומי...');
+  const checks=[
+    ['שרת מופעל',SERVER_CONFIG.enabled],
+    ['סשן קיים',!!serverSession?.token],
+    ['localStorage זמין',(()=>{try{localStorage.setItem('__tech','1');localStorage.removeItem('__tech');return true}catch(e){return false}})()],
+    ['Web Crypto זמין',!!window.crypto?.subtle],
+    ['Fetch זמין',typeof fetch==='function']
+  ];
+  checks.forEach(([name,ok])=>techLog(name+': '+(ok?'OK':'בעיה'),ok?'ok':'warn'));
+  if(SERVER_CONFIG.enabled){
+    try{const d=await api(TECH_CONFIG.diagnose,{method:'POST',body:JSON.stringify({role:role(),posts:sharedPosts().length})});techLog('אבחון שרת: '+String(d.summary||'התקבלו תוצאות'),'ok')}
+    catch(e){techLog('אבחון שרת לא זמין: '+e.message,'warn')}
+  }
+}
+async function techAsk(){
+  if(!canUseTech())return;
+  const input=$('techInput'),msg=input.value.trim().slice(0,500);if(!msg)return;
+  input.value='';techLog('שאלה: '+msg);
+  if(!SERVER_CONFIG.enabled){techLog('אין שרת AI טכני. אפשר לבצע רק אבחון מקומי.','warn');return}
+  try{
+    const d=await api(TECH_CONFIG.ask,{method:'POST',body:JSON.stringify({message:msg,diagnostics:{posts:sharedPosts().length,role:role(),serverEnabled:SERVER_CONFIG.enabled}})});
+    techLog('תשובת AI: '+String(d.reply||'לא התקבלה תשובה'),'ok');
+  }catch(e){techLog('שגיאה: '+e.message,'bad')}
+}
+
+/* ===== AI assistants =====
+   Three separate roles:
+   1) Service AI: end users, public information and finding approved posts.
+   2) Owner AI: only managers, helps the site owner handle requests, page projects and payment explanations.
+   3) Technical AI: only super_manager/super_admin, diagnostics and allow-listed maintenance.
+   No API key belongs in this HTML. Payment AI never performs bank transfers or asks for banking credentials.
+*/
+const AI_CONFIG={
+  serviceEndpoint:window.AI_SERVICE_URL||'/api/ai/service',
+  ownerEndpoint:window.AI_OWNER_URL||'/api/ai/owner',
+  paymentInfoEndpoint:window.AI_PAYMENT_INFO_URL||'/api/public/payment-instructions',
+  maxContext:35
+};
+const SERVER_CONFIG={base:window.LUACH_SERVER_URL||'',enabled:window.LUACH_SERVER_ENABLED!==false};
+const LOCAL_AUTH_WARNING='מצב מקומי אינו מתאים לאימות אמיתי. להפעלה ציבורית יש לחבר שרת מאובטח.';
+let serverPosts=[];
+
+function authHeaders(){return serverSession?.token?{Authorization:'Bearer '+serverSession.token}:{}}
+async function api(path,opts={}){
+  const headers={'Content-Type':'application/json',...authHeaders(),...(opts.headers||{})};
+  const r=await fetch(SERVER_CONFIG.base+path,{...opts,headers});
+  if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e}
+  return r.status===204?{}:r.json();
+}
+async function syncSession(){
+  if(!SERVER_CONFIG.enabled||!serverSession?.token)return;
+  try{
+    const d=await api('/api/auth/me');
+    serverSession={...serverSession,...d.user};cur=d.user.username;sv('LUACH_SESSION',serverSession);sv('CUR3',cur);
+  }catch(e){
+    serverSession=null;sv('LUACH_SESSION',null);cur=null;sv('CUR3',null);
+  }
+}
+async function syncAdminUsers(){
+  if(!SERVER_CONFIG.enabled||!isMgr())return;
+  try{
+    const d=await api('/api/admin/users');
+    if(Array.isArray(d.users)){
+      const U=users();
+      d.users.forEach(x=>{if(U[x.username])U[x.username].role=x.role;else U[x.username]={role:x.role}});
+      sv('U3',U);
+    }
+  }catch(e){console.warn('לא הצלחתי לסנכרן משתמשי ניהול',e)}
+}
+async function syncPosts(){
+  if(!SERVER_CONFIG.enabled)return;
+  try{
+    const d=await api(isMgr()?'/api/posts?admin=1':'/api/posts');
+    if(Array.isArray(d.posts)){serverPosts=d.posts;await syncAdminUsers();render();}
+  }catch(e){serverPosts=[];console.warn('שרת לא זמין; לא מציג נתוני שרת ישנים',e)}
+}
+async function syncConfig(){
+  if(!SERVER_CONFIG.enabled)return;
+  try{
+    const d=await api('/api/config');
+    if(d?.settings){
+      if(Array.isArray(d.settings.categories))sv('C3',d.settings.categories);
+      if(typeof d.settings.ann==='string'){const S=ld('S3',{});S.ann=d.settings.ann;sv('S3',S)}
+      CATS=BASE.concat(Array.isArray(d.settings.categories)?d.settings.categories:[]);
+    }
+  }catch(e){console.warn('לא הצלחתי לסנכרן הגדרות שרת',e)}
+}
+function sharedPosts(){return SERVER_CONFIG.enabled?(Array.isArray(serverPosts)?serverPosts:[]):posts()}
+
+let serviceStarted=false,serviceBusy=false,ownerStarted=false,ownerBusy=false;
+function approvedPosts(){return sharedPosts().filter(p=>p.status==='approved')}
+function normalize(s){return String(s||'').toLocaleLowerCase().replace(/[?!.:,;()\[\]{}"'׳״]/g,' ')}
+function scorePost(p,terms){
+  const text=normalize([p.cat,p.title,p.desc,p.location,p.age,p.salary].join(' '));let n=0;
+  terms.forEach(t=>{if(t&&text.includes(normalize(t)))n+=normalize(t).length>3?2:1});
+  if(p.promo)n+=1;return n;
+}
+function findMatches(msg){
+  const terms=normalize(msg).split(/\s+/).filter(x=>x.length>2);
+  return approvedPosts().map(p=>({p,s:scorePost(p,terms)})).filter(x=>x.s>0)
+    .sort((a,b)=>b.s-a.s||Number(b.p.promo)-Number(a.p.promo)).slice(0,5).map(x=>x.p);
+}
+function safeAIContext(){
+  return approvedPosts().slice(0,AI_CONFIG.maxContext).map(p=>({
+    id:p.id,cat:p.cat,title:p.title,desc:String(p.desc||'').slice(0,500),
+    location:p.location||'',promo:!!p.promo
+  }));
+}
+function addChat(id,text,type='bot'){
+  const c=$(id);if(!c)return;
+  const d=document.createElement('div');d.className='dual-msg '+type;d.textContent=String(text||'');
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function quick(id,items,fn){
+  $(id).innerHTML=(Array.isArray(items)?items:[]).slice(0,4).map(x=>
+    `<button onclick="${fn}(${JSON.stringify(String(x)).replace(/</g,'\\u003c')})">${esc(x)}</button>`).join('');
+}
+function openServiceAI(){
+  open('service');
+  if(!serviceStarted){
+    serviceStarted=true;
+    addChat('serviceChat','שלום 👋 אני עוזר השירות. אני יכול לעזור למצוא מודעות, עסקים ושירותים מתוך הלוח.');
+    quick('serviceQuick',['אני מחפש בעל מקצוע','אני מחפש חנות','איך מפרסמים מודעה?'],'serviceQuickSend');
+  }
+  setTimeout(()=>$('serviceInput').focus(),50);
+}
+function serviceQuickSend(x){$('serviceInput').value=x;serviceSend()}
+function localServiceAI(msg){
+  const m=normalize(msg),matches=findMatches(msg);
+  if(matches.length){
+    const p=matches[0];
+    return {text:`מצאתי מודעה שיכולה להתאים: ${p.title}${p.location?'\n📍 '+p.location:''}\nאפשר לפתוח את המודעה וליצור קשר עם המפרסם.`,quick:matches.slice(0,3).map(x=>'עוד על '+x.title)};
+  }
+  if(/(איך|לפרסם|פרסום|מודעה)/.test(m))return {text:'כדי לפרסם מודעה צריך להתחבר, למלא כותרת ותיאור ולשלוח לאישור מנהל.',quick:['אני מחפש שירות','אני מחפש חנות']};
+  return {text:'אני יכול לעזור למצוא משהו מתוך הלוח. כתוב מה אתה מחפש, ובמידת הצורך גם אזור או תקציב.',quick:['אני צריך שירות','אני מחפש עבודה','אני מחפש אירוע']};
+}
+async function serviceSend(){
+  if(serviceBusy)return;
+  const input=$('serviceInput'),msg=input.value.trim().slice(0,500);if(!msg)return;
+  input.value='';addChat('serviceChat',msg,'user');serviceBusy=true;
+  try{
+    if(SERVER_CONFIG.enabled){
+      const data=await api(AI_CONFIG.serviceEndpoint,{method:'POST',body:JSON.stringify({message:msg,context:safeAIContext()})});
+      addChat('serviceChat',data.reply||'לא התקבלה תשובה.');quick('serviceQuick',data.quick||[],'serviceQuickSend');
+    }else{
+      const r=localServiceAI(msg);addChat('serviceChat',r.text);quick('serviceQuick',r.quick,'serviceQuickSend');
+    }
+  }catch(e){
+    const r=localServiceAI(msg);addChat('serviceChat',r.text+'\n\nהעוזר המקוון לא זמין כרגע, אז עברתי למצב מקומי.');quick('serviceQuick',r.quick,'serviceQuickSend');
+  }finally{serviceBusy=false}
+}
+
+function openOwnerAI(){
+  if(!isMgr())return toast('העוזר האישי זמין רק למנהלים');
+  open('owner');
+  if(!ownerStarted){
+    ownerStarted=true;
+    addChat('ownerChat','אני כאן בשבילך. כתוב לי מה אתה צריך: פנייה של לקוח, בניית עמוד, תמחור, הסבר על העברה בנקאית או משימה אחרת.');
+    addChat('ownerChat','אני לא מבצע העברות בנקאיות ולא מבקש סיסמאות או קודי אימות. אני כן יכול להכין ללקוח הוראות תשלום כלליות לפי פרטי תשלום ציבוריים שהוגדרו בשרת.','note');
+    quick('ownerQuick',['בנה לי תהליך לעמוד חודשי','איך להסביר ללקוח העברה בנקאית?','תעזור לי לנהל פנייה'],'ownerQuickSend');
+  }
+  setTimeout(()=>$('ownerInput').focus(),50);
+}
+function ownerQuickSend(x){$('ownerInput').value=x;ownerSend()}
+function localOwnerAI(msg){
+  const m=normalize(msg);
+  if(/(העברה|בנק|תשלום|לשלם|כסף)/.test(m)){
+    return {text:'אני יכול לנסח ללקוח הוראות להעברה בנקאית בצורה ברורה: שם בעל החשבון, בנק, סניף, מספר חשבון, סכום ואסמכתא — רק לפי פרטי תשלום ציבוריים שהוגדרו אצלך בשרת. לא מוסרים סיסמת בנק, קוד SMS או קוד אימות.',quick:['בנה לי הודעת תשלום','איך עובד תשלום חודשי?']};
+  }
+  if(/(עמוד|אתר|חודשי|מנוי|בנייה|לבנות)/.test(m)){
+    return {text:'אפשר לבנות תהליך מסודר: איסוף דרישות → מבנה העמוד → תוכן ותמונות → אישור הלקוח → הצעת מחיר → תשלום דרך מערכת מאובטחת → פרסום. אני יכול לעזור להכין את השאלון והמפרט.',quick:['תכין שאלון ללקוח','תכין מפרט לעמוד']};
+  }
+  return {text:'קיבלתי. אני יכול לעזור לך להפוך את הבקשה למשימה מסודרת, להכין תשובה ללקוח, או לנסח מפרט לעמוד. כתוב לי מה אתה רוצה שיקרה.',quick:['תכין לי משימה','תעזור לי עם לקוח']};
+}
+async function ownerSend(){
+  if(ownerBusy||!isMgr())return;
+  const input=$('ownerInput'),msg=input.value.trim().slice(0,1000);if(!msg)return;
+  input.value='';addChat('ownerChat',msg,'user');ownerBusy=true;
+  try{
+    if(SERVER_CONFIG.enabled){
+      const data=await api(AI_CONFIG.ownerEndpoint,{method:'POST',body:JSON.stringify({
+        message:msg,context:{posts:approvedPosts().slice(0,10).map(p=>({id:p.id,title:p.title,cat:p.cat}))}
+      })});
+      addChat('ownerChat',data.reply||'לא התקבלה תשובה.');quick('ownerQuick',data.quick||[],'ownerQuickSend');
+    }else{
+      const r=localOwnerAI(msg);addChat('ownerChat',r.text);quick('ownerQuick',r.quick,'ownerQuickSend');
+    }
+  }catch(e){
+    const r=localOwnerAI(msg);addChat('ownerChat',r.text+'\n\nהעוזר המקוון לא זמין כרגע, אז עברתי למצב מקומי.');quick('ownerQuick',r.quick,'ownerQuickSend');
+  }finally{ownerBusy=false}
+}
+
+/* Public payment instructions are fetched from the server, never from a bank account login. */
+async function getPaymentInstructions(){
+  if(!SERVER_CONFIG.enabled||!isMgr()||!serverSession?.token) return null;
+  try{
+    const d=await api(AI_CONFIG.paymentInfoEndpoint,{headers:{'X-Payment-Use':'manager'}});
+    return d.instructions||null;
+  }catch(e){return null}
+}
+
+
+/* ===== Personal AI Developer / Safe Tool Agent =====
+   The personal developer is an allowlisted agent.
+   It may modify supported site configuration locally and can call
+   a server-side agent at /api/ai/developer when a real backend exists.
+   It never executes arbitrary JavaScript from an AI response.
+*/
+const DEV_AI_CONFIG={
+  endpoint:window.DEV_AI_API_URL||'/api/ai/developer',
+  maxMessage:700,
+  allowLocalFallback:true
+};
+let devAiStarted=false,devAiBusy=false;
+
+function canUseDevAI(){
+  return ['super_admin','super_manager'].includes(role());
+}
+function devAiLog(text,type='bot'){
+  const c=$('devAiChat'); if(!c)return;
+  const d=document.createElement('div'); d.className='devai-msg '+type;
+  d.textContent=text; c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function devAiQuick(items){
+  $('devAiQuick').innerHTML=(items||[]).slice(0,4).map(x=>
+    `<button onclick="devAiQuickRun(${JSON.stringify(x).replace(/</g,'\\u003c')})">${esc(x)}</button>`
+  ).join('');
+}
+function devAiQuickRun(x){$('devAiInput').value=x;devAiSend()}
+function openDevAI(){
+  if(!canUseDevAI())return toast('המפתח האישי זמין רק למנהל בכיר או מנהל ראשי');
+  open('devai');
+  if(!devAiStarted){
+    devAiStarted=true;
+    devAiLog('שלום. תגיד לי מה אתה רוצה לשנות באתר, למשל: "תוסיף קטגוריית טרמפים". אני אזהה את המשימה, אבנה שינוי בטוח ואציג מה בוצע.');
+    devAiQuick(['תוסיף קטגוריית טרמפים','תוסיף קטגוריית בעלי מקצוע','שנה את הודעת דף הבית']);
+  }
+  setTimeout(()=>$('devAiInput').focus(),50);
+}
+function devAiPlanShow(title,steps){
+  const e=$('devAiPlan'); e.hidden=false;
+  e.innerHTML=`<b>תוכנית שינוי: ${esc(title)}</b><div>${steps.map((s,i)=>(i+1)+'. '+esc(s)).join('<br>')}</div>`;
+}
+function devAiHidePlan(){const e=$('devAiPlan');if(e){e.hidden=true;e.textContent=''}}
+
+function devAiLocalPlan(msg){
+  const m=normalize(msg);
+  if(/(טרמפים|טרמפ|נסיעות|הסעות)/.test(m)){
+    return {kind:'add_category',name:'טרמפים',icon:'🚗',reply:'מצאתי בקשה להוספת קטגוריית טרמפים. אני יכול להוסיף אותה לרשימת הקטגוריות ולרענן את הלוח.',steps:['להוסיף את קטגוריית "טרמפים"','להקצות לה אייקון 🚗','להוסיף אותה לתפריט ולאריחים','לרענן את התצוגה'],quick:['תוסיף גם קטגוריית בעלי מקצוע','תוסיף קטגוריית ציוד לתינוקות']};
+  }
+  if(/(בעלי מקצוע|מקצוענים|נותני שירות)/.test(m)){
+    return {kind:'add_category',name:'בעלי מקצוע',icon:'🧰',reply:'אני יכול להוסיף קטגוריית "בעלי מקצוע" לאתר.',steps:['להוסיף את הקטגוריה','להקצות אייקון 🧰','לעדכן את תפריט הקטגוריות','לרענן את האתר'],quick:[]};
+  }
+  if(/(הודעה|הודעת דף הבית|הודעה ראשית)/.test(m) && role()==='super_admin'){
+    const match=msg.match(/(?:הודעה|הודעת דף הבית|הודעה ראשית)\\s*(?:ל|:|היא)?\\s*(.+)$/i);
+    if(match&&match[1].trim().length>2){
+      return {kind:'set_announcement',text:match[1].trim().slice(0,300),reply:'אני יכול לעדכן את הודעת דף הבית.',steps:['לשמור את ההודעה בהגדרות האתר','לרענן את דף הבית'],quick:[]};
+    }
+  }
+  if(/(בדיקה|אבחון|בדוק|באג|תקלה)/.test(m)){
+    return {kind:'diagnose',reply:'אני יכול להריץ בדיקת אבחון דרך שרת המנהל אם הוא מחובר.',steps:['בדיקת שרת','בדיקת סשן','בדיקת סנכרון נתונים','החזרת רשימת תקלות'],quick:['בדוק את השרת','תוסיף קטגוריית טרמפים']};
+  }
+  return {kind:'server_ai',reply:'אני לא רוצה לנחש שינוי בקוד. אעביר את הבקשה למפתח AI בצד השרת אם הוא מוגדר.',steps:['שליחת הבקשה לשרת המפתח','קבלת תוכנית שינוי','ביצוע רק של פעולות מורשות'],quick:['תוסיף קטגוריית טרמפים','בדוק את האתר']};
+}
+
+function devAiApplyLocal(plan){
+  if(!canUseDevAI())throw new Error('אין הרשאה');
+  if(plan.kind==='add_category'){
+    const name=String(plan.name||'').trim().slice(0,30);
+    const icon=String(plan.icon||'🏷️').trim().slice(0,4);
+    if(!name)return 'לא נמצא שם קטגוריה.';
+    if(CATS.some(c=>c[0]===name))return `הקטגוריה "${name}" כבר קיימת.`;
+    const X=ld('C3',[]);
+    const color=XC[X.length%XC.length];
+    X.push([name,icon,color]);
+    if(!sv('C3',X))return 'לא הצלחתי לשמור את הקטגוריה.';
+    CATS=BASE.concat(X);
+    render();
+    return `בוצע ✅ הוספתי את קטגוריית "${name}" עם ${icon}.`;
+  }
+  if(plan.kind==='set_announcement'){
+    if(role()!=='super_admin')return 'רק מנהל ראשי יכול לשנות הודעת מערכת.';
+    const S=ld('S3',{});
+    S.ann=String(plan.text||'').slice(0,300);
+    if(!sv('S3',S))return 'לא הצלחתי לשמור את ההודעה.';
+    render();
+    return 'בוצע ✅ הודעת דף הבית עודכנה.';
+  }
+  if(plan.kind==='diagnose'){
+    return 'בדיקת אבחון מקומית: האפליקציה נטענה, הקטגוריות זמינות, והאחסון המקומי נגיש. בדיקת שרת מלאה דורשת backend.';
+  }
+  return null;
+}
+
+async function devAiServer(msg){
+  if(!SERVER_CONFIG.enabled || !serverSession?.token) return null;
+  try{
+    const r=await api(DEV_AI_CONFIG.endpoint,{
+      method:'POST',
+      body:JSON.stringify({
+        message:msg,
+        page:location.pathname,
+        requestedBy:cur,
+        capabilities:['add_category','set_announcement','diagnose','sync'],
+        instruction:'Return a structured plan using only allowlisted capabilities. Never return executable JavaScript.'
+      })
+    });
+    return r;
+  }catch(e){
+    return null;
+  }
+}
+
+async function devAiSend(){
+  if(devAiBusy||!canUseDevAI())return;
+  const input=$('devAiInput'),msg=input.value.trim().slice(0,DEV_AI_CONFIG.maxMessage);
+  if(!msg)return;
+  input.value='';devAiHidePlan();devAiLog(msg,'user');devAiBusy=true;
+  $('devAiStatus').textContent='מנתח את הבקשה…';
+  try{
+    const local=devAiLocalPlan(msg);
+    devAiPlanShow(local.name||local.kind,local.steps||[]);
+    const remote=await devAiServer(msg);
+
+    // A real backend may return a structured, allowlisted action.
+    if(remote && remote.action){
+      const allowed=['add_category','set_announcement','diagnose','sync'];
+      if(!allowed.includes(remote.action)){
+        devAiLog('השרת החזיר פעולה שאינה ברשימת הפעולות המורשות — לא ביצעתי אותה.');
+      }else if(remote.preview){
+        devAiLog('קיבלתי תוכנית מהשרת, אבל אני לא מריץ קוד חופשי. רק פעולות מורשות יכולות להתבצע.');
+      }else{
+        if(remote.action==='add_category' && remote.category){
+          const X=ld('C3',[]);
+          if(!X.some(c=>c[0]===remote.category[0])){X.push(remote.category);sv('C3',X)}
+          CATS=BASE.concat(X);
+        }
+        if(remote.action==='set_announcement' && typeof remote.announcement==='string'){
+          const S=ld('S3',{});S.ann=remote.announcement;sv('S3',S);
+        }
+        await syncConfig();
+        render();
+        devAiLog(String(remote.reply||'השרת ביצע פעולה מורשית.'));
+      }
+      devAiQuick(remote.quick||[]);
+    }else{
+      const result=devAiApplyLocal(local);
+      if(result)devAiLog(result);
+      else devAiLog(local.reply);
+      devAiQuick(local.quick||[]);
+    }
+  }catch(e){
+    devAiLog('לא ביצעתי שינוי כי הבקשה לא עברה את בדיקות הבטיחות. '+String(e.message||''));
+  }finally{
+    $('devAiStatus').textContent='';
+    devAiBusy=false;
+  }
+}
+
+/* ===== Manager access: code only =====
+   No username or password is required for manager entry.
+   The manager code is checked locally in the page.
+*/
+const MANAGER_ACCESS_CODE='brhv5215';
+function openAuth(m='login'){
+  mode='login';
+  $('authT').textContent='כניסת מנהלים';
+  $('authGo').textContent='כניסה';
+  const c=$('aCode');
+  if(c)c.value='';
+  open('auth');
+  setTimeout(()=>c&&c.focus(),50);
+}
+function authGo(){
+  const c=String($('aCode')?.value||'').trim();
+  if(c!==MANAGER_ACCESS_CODE){
+    toast('קוד מנהל שגוי');
+    return;
+  }
+  serverSession={token:null,username:'מנהל ראשי',role:'super_admin',localCode:true};
+  cur='מנהל ראשי';
+  sv('LUACH_SESSION',serverSession);
+  sv('CUR3',cur);
+  view='home';
+  shut('auth');
+  render();
+  toast('נכנסת כמנהל ראשי בהצלחה');
+}
+
+// Show/hide personal developer button with permissions.
+const _devAiOriginalRender=render;
+render=function(){
+  _devAiOriginalRender();
+  const b=$('devAiFab'); if(b)b.hidden=!canUseDevAI();
+};
+
+(async()=>{
+  // Render the full page immediately. Server synchronization runs in the background
+  // so a slow/missing /api/config endpoint can never leave the page blank.
+  render();
+  try{await syncSession();}catch(e){console.warn('סנכרון התחברות נכשל:',e)}
+  try{await syncConfig();}catch(e){console.warn('סנכרון הגדרות נכשל:',e)}
+  try{await syncPosts();}catch(e){console.warn('סנכרון מודעות נכשל:',e)}
+  render();
+})();
+</script>
+<button id="boardAiFab" class="board-ai-fab" hidden onclick="openBoardAI()">🧠 בורד — מנהל האתר</button>
+<div id="boardAiModal" class="board-ai-modal" aria-hidden="true"><div class="board-ai-box">
+<div class="board-ai-head"><div><h2 style="margin:0">🧠 בורד</h2><div style="font-size:12px;color:#64748b">AI ניהול ופיתוח — מנהל ראשי בלבד</div></div><button onclick="closeBoardAI()">✕</button></div>
+<div id="boardAiStatus"></div><div id="boardAiChat" class="board-ai-chat"></div><div id="boardAiPlan" class="board-ai-plan" hidden></div>
+<div class="board-ai-input"><textarea id="boardAiInput" maxlength="2000" placeholder="לדוגמה: בורד, תשדרג את מערכת הטרמפים"></textarea><button onclick="boardAiSend()">שלח</button></div>
+<div style="font-size:12px;color:#b91c1c">בורד אינו מקבל סיסמאות, קודי SMS או פרטי בנק. פעולות מסוכנות דורשות אישור.</div>
+</div></div><script id="board-ai-js">
+const BOARD_AI_CONFIG={endpoint:window.BOARD_AI_API_URL||'/api/ai/board',maxMessage:2000};
+let boardAiBusy=false,boardAiActivated=false,boardAiPendingTask=null;
+function canUseBoardAI(){return typeof role==='function'&&role()==='super_admin'}
+function boardAiLog(t,type='bot'){const b=document.getElementById('boardAiChat');if(!b)return;const d=document.createElement('div');d.className='board-ai-msg '+(type==='user'?'user':'bot');d.textContent=String(t||'');b.appendChild(d);b.scrollTop=b.scrollHeight}
+function openBoardAI(){
+  if(!canUseBoardAI()){alert('בורד זמין רק למנהל הראשי.');return}
+  const m=document.getElementById('boardAiModal');m.classList.add('show');m.setAttribute('aria-hidden','false');
+  if(!document.getElementById('boardAiChat').children.length){
+    boardAiLog('🧠 בורד מוכן.');
+    boardAiLog('שלב 1: כתוב בדיוק "בורד בורדי".\nשלב 2: כתוב מה אתה רוצה שאעשה.\nשלב 3: אני אציג תוכנית ושינויים מוצעים. רק אם תכתוב בדיוק "ברהב" בורד יבצע את השינוי המאושר ב-GitHub.');
+  }
+}
+function closeBoardAI(){const m=document.getElementById('boardAiModal');m.classList.remove('show');m.setAttribute('aria-hidden','true')}
+function boardAiPlanShow(p){const e=document.getElementById('boardAiPlan');if(!p){e.hidden=true;e.textContent='';return}let t='תוכנית עבודה:\n'+(p.steps||[]).map((x,i)=>(i+1)+'. '+x).join('\n');if(p.file)t+='\n\nקובץ: '+p.file;if(p.summary)t+='\nסיכום: '+p.summary;if(Array.isArray(p.changes)&&p.changes.length)t+='\n\nשינויים שהוצעו: '+p.changes.length+' קטעים';e.hidden=false;e.textContent=t}
+async function boardAiSend(){
+  if(boardAiBusy||!canUseBoardAI())return;
+  const i=document.getElementById('boardAiInput'),msg=i.value.trim().slice(0,BOARD_AI_CONFIG.maxMessage);if(!msg)return;
+  i.value='';boardAiLog(msg,'user');boardAiBusy=true;document.getElementById('boardAiStatus').textContent='בורד עובד…';
+  try{
+    if(!boardAiActivated){
+      if(msg!=='בורד בורדי'){boardAiLog('כדי להתחיל כתוב בדיוק: בורד בורדי');return}
+      const r=await api(BOARD_AI_CONFIG.endpoint,{method:'POST',body:JSON.stringify({message:msg,requestedBy:cur})});
+      boardAiActivated=true;boardAiPendingTask=null;boardAiPlanShow(null);boardAiLog(r.reply||'בורד הופעל.');return;
+    }
+    if(msg==='ברהב'){
+      if(!boardAiPendingTask){boardAiLog('אין כרגע משימה ממתינה לאישור. קודם כתוב את המשימה.');return}
+      const r=await api(BOARD_AI_CONFIG.endpoint,{method:'POST',body:JSON.stringify({message:'ברהב',approvalPhrase:'ברהב',taskId:boardAiPendingTask,requestedBy:cur})});
+      boardAiLog(r.reply||'בוצע.');
+      if(r.action==='add_category'&&r.category){const X=ld('C3',[]);if(!X.some(c=>c[0]===r.category[0])){X.push(r.category);sv('C3',X)}CATS=BASE.concat(X);render();}
+      if(r.action==='set_announcement'&&typeof r.announcement==='string'){const S=ld('S3',{});S.ann=r.announcement;sv('S3',S);render();}
+      if(r.action==='github_code_change'){boardAiLog((r.commitUrl?'🔗 '+r.commitUrl+'\n':'')+'השינוי נשמר ב-GitHub.','bot');}
+      boardAiPendingTask=null;boardAiPlanShow(null);return;
+    }
+    // A new task always replaces the old pending approval. The old task stays server-side
+    // but cannot be executed unless its own task id is explicitly supplied; the UI drops it.
+    boardAiPlanShow(null);
+    const r=await api(BOARD_AI_CONFIG.endpoint,{method:'POST',body:JSON.stringify({message:msg,activated:true,requestedBy:cur,capabilities:['inspect_site','diagnose','read_code','search_code','preview_change','add_category','update_settings','stats','list_categories']})});
+    if(r.plan)boardAiPlanShow(r.plan);
+    boardAiPendingTask=r.taskId||null;
+    boardAiLog(r.reply||'התוכנית מוכנה.');
+    if(r.needsApproval)boardAiLog('🔐 לא בוצע שינוי. בדוק את התוכנית. אם אתה מאשר בדיוק את השינוי המוצג, כתוב: ברהב');
+  }catch(e){boardAiLog('בורד עצר את הפעולה: '+String(e.message||e))}
+  finally{boardAiBusy=false;document.getElementById('boardAiStatus').textContent=''}
+}
+const _boardRender=render;render=function(){_boardRender();const b=document.getElementById('boardAiFab');if(b)b.hidden=!canUseBoardAI()};
+</script></body>
+</html>
