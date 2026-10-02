@@ -1,3 +1,4 @@
+
 const H={
   "content-type":"application/json; charset=utf-8",
   "cache-control":"no-store"
@@ -9,6 +10,9 @@ const json=(x,s=200)=>new Response(JSON.stringify(x),{
 });
 
 const fail=(x,s=400)=>json({error:x},s);
+const ALLOWED_CATEGORIES = new Set(["חנויות","יד שנייה","למסירה","חוגים","אירועים","חדשות","דרושים"]);
+const MANAGERS = ["manager","super_manager","super_admin"];
+
 
 async function body(r){
   try{return await r.json()}
@@ -261,68 +265,43 @@ async function postsApi(req,env,u,url){
     const q=admin
       ?"SELECT * FROM posts ORDER BY created_at DESC"
       :"SELECT * FROM posts WHERE status='approved' ORDER BY created_at DESC";
-
     const {results}=await env.DB.prepare(q).all();
-
-    return json({
-      posts:results||[]
-    });
+    const posts=(results||[]).map(p=>({...p,cat:p.cat==="יד2"?"יד שנייה":p.cat})).filter(p=>ALLOWED_CATEGORIES.has(p.cat));
+    return json({posts});
   }
 
   if(req.method==="POST"){
     const b=await body(req);
-
-    const id=String(
-      b.id||crypto.randomUUID()
-    ).slice(0,100);
-
+    const cat=String(b.cat||"").trim();
+    const title=String(b.title||"").trim().slice(0,120);
+    const desc=String(b.desc||"").trim().slice(0,1500);
+    if(!ALLOWED_CATEGORIES.has(cat)) return fail("קטגוריה לא מאושרת",400);
+    if(!title||!desc) return fail("חסרים פרטי מודעה",400);
+    if(cat==="אירועים"&&(!u||!MANAGERS.includes(u.role))) return fail("פרסום אירועים מתבצע דרך הנהלת האתר",403);
+    if(cat==="חנויות"){
+      const shopSetting=await env.DB.prepare("SELECT value FROM settings WHERE key='shop_free'").first();
+      if(shopSetting?.value==="0") return fail("פרסום מודעות בחנויות אינו פתוח כרגע בחינם",402);
+    }
+    const id=String(b.id||crypto.randomUUID()).slice(0,100);
+    const imageUrl=String(b.image_url||"").trim().slice(0,500);
+    if(imageUrl && !imageUrl.startsWith("/media/")) return fail("כתובת תמונה לא תקינה",400);
     const item={
-      id,
-      cat:String(b.cat||"").slice(0,40),
-      title:String(b.title||"").slice(0,120),
-      desc:String(b.desc||"").slice(0,1500),
+      id,cat,title,desc,
       age:String(b.age||"").slice(0,60),
       salary:String(b.salary||"").slice(0,80),
       location:String(b.location||"").slice(0,120),
-      phone:String(b.phone||"").slice(0,40),
-      author:String(b.author||"מבקר").slice(0,80),
-      status:"pending",
+      phone:String(b.phone||"").replace(/[^\d+]/g,"").slice(0,40),
+      author:String(u?.username||"אורח").slice(0,80),
+      image_url:imageUrl,
+      status:cat==="דרושים"?"approved":"pending",
       promo:0,
-      date:String(
-        b.date||new Date().toLocaleDateString("he-IL")
-      ).slice(0,40),
+      date:new Date().toLocaleDateString("he-IL"),
       created_at:Date.now()
     };
-
-    if(
-      !item.cat||
-      !item.title||
-      !item.desc
-    )
-      return fail("חסרים פרטי מודעה",400);
-
     await env.DB.prepare(
-      "INSERT OR REPLACE INTO posts(id,cat,title,desc,age,salary,location,phone,author,status,promo,date,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"
-    ).bind(
-      item.id,
-      item.cat,
-      item.title,
-      item.desc,
-      item.age,
-      item.salary,
-      item.location,
-      item.phone,
-      item.author,
-      item.status,
-      item.promo,
-      item.date,
-      item.created_at
-    ).run();
-
-    return json({
-      ok:true,
-      post:item
-    },201);
+      "INSERT INTO posts(id,cat,title,desc,age,salary,location,phone,author,status,promo,date,created_at,image_url) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    ).bind(item.id,item.cat,item.title,item.desc,item.age,item.salary,item.location,item.phone,item.author,item.status,item.promo,item.date,item.created_at,item.image_url).run();
+    return json({ok:true,post:item},201);
   }
 
   const id=decodeURIComponent(
@@ -419,7 +398,7 @@ async function techDiagnose(req,env,u){
     ].includes(u.role)
   )
     return fail("אין הרשאה",403);
-
+  
   const [
     usersCount,
     postsCount,
@@ -463,24 +442,18 @@ async function techAsk(req,env,u){
     return fail("אין הרשאה",403);
 
   const b=await body(req);
-
-  const msg=String(
-    b.message||""
-  ).trim().slice(0,500);
+  const msg=String(b.message||"").trim().slice(0,500);
 
   return json({
     reply:msg
-      ?`קיבלתי את הבקשה. במצב זה המנהל הטכני יכול לבצע אבחון ופעולות מורשות בלבד. הבקשה שנבדקה: ${msg}`
+      ?`קיבלתי את הבקשה. כרגע אפשר לבצע אבחון ופעולות מורשות בלבד. הבקשה שנבדקה: ${msg}`
       :"כתוב מה לבדוק."
   });
 }
 
 async function publicServiceAi(req,env){
   const b=await body(req);
-
-  const msg=String(
-    b.message||""
-  ).trim().slice(0,500);
+  const msg=String(b.message||"").trim().slice(0,500);
 
   const {results}=await env.DB.prepare(
     "SELECT id,cat,title,desc,location,phone FROM posts WHERE status='approved' ORDER BY created_at DESC LIMIT 35"
@@ -495,20 +468,13 @@ async function publicServiceAi(req,env){
     .map(p=>({
       p,
       score:terms.reduce(
-        (n,t)=>
-          n+
-          (
-            String([
-              p.cat,
-              p.title,
-              p.desc,
-              p.location
-            ].join(" "))
-            .toLocaleLowerCase()
-            .includes(t)
-            ?1:0
-          ),
-        0
+        (n,t)=>n+(
+          String([
+            p.cat,p.title,p.desc,p.location
+          ].join(" "))
+          .toLocaleLowerCase()
+          .includes(t)?1:0
+        ),0
       )
     }))
     .filter(x=>x.score>0)
@@ -516,11 +482,9 @@ async function publicServiceAi(req,env){
     .slice(0,3);
 
   return json({
-    reply:
-      matches.length
-        ?`מצאתי ${matches.length} מודעות שיכולות להתאים לבקשה שלך.`
-        :"לא מצאתי כרגע התאמה ברורה בלוח. נסה לכתוב מה אתה מחפש, אזור או סוג שירות.",
-
+    reply:matches.length
+      ?`מצאתי ${matches.length} מודעות שיכולות להתאים לבקשה שלך.`
+      :"לא מצאתי כרגע התאמה ברורה בלוח. נסה לכתוב מה אתה מחפש או באיזה אזור.",
     quick:matches.map(x=>x.p.title)
   });
 }
@@ -537,16 +501,12 @@ async function ownerAi(req,env,u){
     return fail("אין הרשאה",403);
 
   const b=await body(req);
-
-  const msg=String(
-    b.message||""
-  ).trim().slice(0,1000);
+  const msg=String(b.message||"").trim().slice(0,1000);
 
   return json({
     reply:msg
-      ?`קיבלתי. אני יכול לעזור להפוך את זה למשימה מסודרת, להכין תשובה ללקוח או מפרט. הבקשה: ${msg}`
+      ?`קיבלתי. אפשר להפוך את הבקשה למשימה מסודרת או למפרט. הבקשה: ${msg}`
       :"כתוב לי מה אתה צריך.",
-
     quick:[
       "תכין משימה",
       "תכין מפרט ללקוח"
@@ -566,86 +526,47 @@ async function developerAi(req,env,u){
 
   return json({
     action:"diagnose",
-    preview:true,
-    reply:
-      "השרת זמין, אבל סוכן הפיתוח אינו מריץ קוד חופשי. פעולות שינוי חייבות לעבור דרך כלי מורשה."
+    reply:"כלי המפתח זמין לאבחון בסיסי. עדיין לא בוצע שינוי בקוד."
   });
 }
 
-
-/* =========================================================
-   BOARD
-   ========================================================= */
-
 async function board(req,env,u){
-
   const b=await body(req);
-  const msg=String(b.message||"").trim().slice(0,2000);
-  const normalized=msg.replace(/\s+/g," ").trim();
-  const approval=String(b.approvalPhrase||"").trim();
-  const taskId=String(b.taskId||"").trim();
+  const msg=String(b.message||"").trim().slice(0,1000);
 
-  /* אישור */
+  if(!msg)
+    return json({
+      stage:"chat",
+      reply:"שלום! אני בורד. במה אוכל לעזור?",
+      needsApproval:false
+    });
 
-  if(normalized==="אישור" || approval==="אישור"){
-
-    if(!u){
-      return json({
-        stage:"login_required",
-        reply:"כדי לבצע שינוי באתר צריך להתחבר כמנהל ראשי.",
-        needsApproval:false,
-        requiresAdmin:true
-      });
-    }
-
-    if(u.role!=="super_admin"){
-      return json({
-        stage:"permission_required",
-        reply:"כדי לבצע שינוי באתר צריך הרשאת מנהל ראשי.",
-        needsApproval:false,
-        requiresAdmin:true
-      });
-    }
-
-    if(!taskId){
-      return json({
-        stage:"waiting",
-        reply:"אין כרגע משימה ממתינה לאישור.",
-        needsApproval:false
-      },409);
-    }
+  // אישור מבצע רק משימה שממתינה, של אותו מנהל.
+  if(msg==="אישור"){
+    if(!u||u.role!=="super_admin")
+      return fail("רק מנהל ראשי יכול לאשר ביצוע",403);
 
     const pending=await env.DB.prepare(
-      "SELECT id,message,plan_json,status,expires_at FROM board_tasks WHERE id=? AND user_id=? AND status='pending' AND expires_at>? LIMIT 1"
-    ).bind(taskId,u.id,Date.now()).first();
+      "SELECT id,message,plan_json FROM board_tasks WHERE user_id=? AND status='pending' AND expires_at>? ORDER BY created_at DESC LIMIT 1"
+    ).bind(u.id,Date.now()).first();
 
-    if(!pending){
+    if(!pending)
       return json({
-        stage:"expired",
-        reply:"המשימה פגה או שכבר בוצעה. שלח אותה מחדש.",
+        stage:"chat",
+        reply:"אין משימה שממתינה לאישור.",
         needsApproval:false
-      },409);
-    }
+      });
 
-    let p={};
-
-    try{
-      p=JSON.parse(pending.plan_json||"{}");
-    }catch{
-      p={};
-    }
-
-    let result=null;
+    const p=JSON.parse(pending.plan_json||"{}");
+    let result;
 
     if(p.kind==="add_category"){
-
       const name=String(p.name||"").trim().slice(0,40);
-      const icon=String(p.icon||"🏷️").trim().slice(0,8);
 
-      if(!name){
+      if(!name||!ALLOWED_CATEGORIES.has(name)){
         return json({
           stage:"blocked",
-          reply:"לא נמצא שם תקין לקטגוריה.",
+          reply:"אפשר להוסיף רק את הקטגוריות הקבועות של האתר.",
           needsApproval:false
         },422);
       }
@@ -655,141 +576,74 @@ async function board(req,env,u){
       ).bind(name).first();
 
       if(existing){
-
         result={
-          reply:`הקטגוריה "${name}" כבר קיימת.`,
-          action:"add_category",
-          category:[
-            existing.name,
-            existing.icon,
-            existing.color
-          ]
+          reply:"הקטגוריה כבר קיימת.",
+          action:"add_category"
         };
-
       }else{
-
         const palette=[
-          "#0ea5e9",
-          "#16a34a",
-          "#f59e0b",
-          "#8b5cf6",
-          "#ef4444",
-          "#0891b2"
+          "#0ea5e9","#16a34a","#f59e0b",
+          "#8b5cf6","#ef4444","#0891b2"
         ];
 
         const count=await env.DB.prepare(
           "SELECT COUNT(*) c FROM categories"
         ).first();
 
-        const color=
-          palette[
-            Number(count?.c||0)%palette.length
-          ];
+        const color=palette[
+          Number(count?.c||0)%palette.length
+        ];
 
         await env.DB.prepare(
           "INSERT INTO categories(name,icon,color) VALUES(?,?,?)"
-        ).bind(name,icon,color).run();
+        ).bind(name,String(p.icon||"🏷️"),color).run();
 
         result={
-          reply:`בוצע ✅ הוספתי את קטגוריית "${name}".`,
-          action:"add_category",
-          category:[
-            name,
-            icon,
-            color
-          ]
+          reply:`הקטגוריה "${name}" נוספה.`,
+          action:"add_category"
         };
       }
-
     }else if(p.kind==="set_announcement"){
-
-      const announcement=String(
-        p.text||""
-      ).trim().slice(0,300);
+      const announcement=String(p.text||"").trim().slice(0,300);
 
       await env.DB.prepare(
         "INSERT INTO settings(key,value) VALUES('ann',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value"
       ).bind(announcement).run();
 
       result={
-        reply:"בוצע ✅ הודעת דף הבית עודכנה.",
-        action:"set_announcement",
-        announcement
+        reply:"הודעת דף הבית עודכנה.",
+        action:"set_announcement"
       };
-
     }else if(p.kind==="diagnose"){
-
-      const [
-        a,
-        posts,
-        categories,
-        pendingCount
-      ]=await Promise.all([
-
-        env.DB.prepare(
-          "SELECT COUNT(*) c FROM users"
-        ).first(),
-
-        env.DB.prepare(
-          "SELECT COUNT(*) c FROM posts"
-        ).first(),
-
-        env.DB.prepare(
-          "SELECT COUNT(*) c FROM categories"
-        ).first(),
-
-        env.DB.prepare(
-          "SELECT COUNT(*) c FROM posts WHERE status='pending'"
-        ).first()
-      ]);
+      const posts=await env.DB.prepare(
+        "SELECT COUNT(*) c FROM posts"
+      ).first();
 
       result={
-        reply:
-          `אבחון השרת הסתיים. משתמשים: ${a?.c||0}, מודעות: ${posts?.c||0}, קטגוריות: ${categories?.c||0}, מודעות ממתינות: ${pendingCount?.c||0}.`,
+        reply:`האבחון הסתיים. מספר המודעות במסד הנתונים: ${posts?.c||0}.`,
         action:"diagnose"
       };
-
     }else{
-
-      await audit(
-        env,
-        u,
-        "board_blocked_execution",
-        pending.message
-      );
-
       return json({
         stage:"blocked",
-        reply:"המשימה הזו עדיין לא מחוברת לכלי ביצוע מורשה.",
+        reply:"סוג המשימה הזה אינו נתמך לביצוע אוטומטי.",
         needsApproval:false
       },422);
     }
 
     await env.DB.prepare(
       "UPDATE board_tasks SET status='executed' WHERE id=?"
-    ).bind(taskId).run();
+    ).bind(pending.id).run();
 
-    await audit(
-      env,
-      u,
-      "board_execute",
-      JSON.stringify({
-        taskId,
-        kind:p.kind
-      })
-    );
+    await audit(env,u,"board_execute",pending.id);
 
     return json({
       ...result,
       stage:"executed",
-      taskId,
+      taskId:pending.id,
       needsApproval:false
     });
   }
-
-  /*
-   * משימות שהשרת יודע לבצע
-   */
 
   let p=null;
 
@@ -798,25 +652,17 @@ async function board(req,env,u){
   );
 
   if(addMatch){
-
-    const name=String(
-      addMatch[1]||""
-    ).trim().slice(0,40);
+    const name=String(addMatch[1]||"").trim().slice(0,40);
 
     if(name){
-
       p={
         kind:"add_category",
         name,
-        icon:String(
-          addMatch[2]||"🏷️"
-        ).trim().slice(0,8),
-
+        icon:String(addMatch[2]||"🏷️").trim().slice(0,8),
         steps:[
-          "בדיקת קיום הקטגוריה",
-          "הכנת השינוי",
-          "הצגת התוכנית",
-          "המתנה לאישור"
+          "בדיקת הקטגוריה",
+          "הצגת תוכנית",
+          "המתנה לאישור מנהל ראשי"
         ]
       };
     }
@@ -827,86 +673,50 @@ async function board(req,env,u){
   );
 
   if(!p&&annMatch){
-
     p={
       kind:"set_announcement",
-
-      text:String(
-        annMatch[1]||""
-      ).trim().slice(0,300),
-
+      text:String(annMatch[1]||"").trim().slice(0,300),
       steps:[
-        "בדיקת הרשאת מנהל ראשי",
-        "הכנת עדכון הודעת המערכת",
-        "הצגת התוכנית",
-        "המתנה לאישור"
+        "הכנת הודעת דף הבית",
+        "הצגת תוכנית",
+        "המתנה לאישור מנהל ראשי"
       ]
     };
   }
 
-  if(
-    !p&&
-    /בדוק|אבחון|באג|תקלה|סטטוס/.test(msg)
-  ){
-
+  if(!p&&/בדוק|אבחון|באג|תקלה|סטטוס/.test(msg)){
     p={
       kind:"diagnose",
-
       steps:[
-        "בדיקת מסד הנתונים",
-        "בדיקת משתמשים ומודעות",
-        "בדיקת קטגוריות",
-        "הצגת התוכנית",
-        "המתנה לאישור"
+        "בדיקת נתוני האתר",
+        "הצגת תוצאות האבחון"
       ]
     };
   }
 
-  /*
-   * בקשה כללית:
-   * כאן לא נחזיר יותר את הודעת "אין כלי מורשה".
-   * במקום זאת נציג לבורד שהבקשה התקבלה,
-   * ובשלב הבא נחבר כאן את ה-AI.
-   */
-
   if(!p){
-
     return json({
       stage:"chat",
-      reply:
-        `קיבלתי את הבקשה שלך:\n\n"${msg}"\n\nאני יכול לנתח אותה ולבנות עבורך תוכנית פעולה. כרגע פעולות שינוי אמיתיות נתמכות רק עבור הכלים המורשים של בורד.`,
+      reply:`קיבלתי את הבקשה שלך:\n\n"${msg}"\n\nאפשר להמשיך לתכנן את המשימה. לא בוצע שינוי באתר.`,
       needsApproval:false,
       action:"chat"
     });
   }
 
-  /*
-   * אם אין משתמש מחובר:
-   * אפשר עדיין לדבר עם בורד ולראות תוכנית.
-   */
-
   if(!u){
-
     return json({
       stage:"planned",
       taskId:null,
-
-      reply:
-        "קיבלתי את המשימה והכנתי תוכנית. לא בוצע שום שינוי באתר. כדי לבצע שינוי בפועל צריך להתחבר כמנהל ראשי.",
-
+      reply:"הכנתי תוכנית בלבד. כדי לבצע שינוי בפועל צריך להתחבר כמנהל ראשי.",
       action:"preview_change",
       needsApproval:false,
       requiresAdmin:true,
-      plan:{
-        steps:p.steps
-      }
+      plan:{steps:p.steps}
     });
   }
 
-  /*
-   * משתמש מחובר:
-   * שומרים את המשימה וממתינים ל"אישור".
-   */
+  if(u.role!=="super_admin")
+    return fail("רק מנהל ראשי יכול לתכנן ולאשר שינויים",403);
 
   const id=crypto.randomUUID();
   const expires=Date.now()+10*60*1000;
@@ -914,309 +724,186 @@ async function board(req,env,u){
   await env.DB.prepare(
     "INSERT INTO board_tasks(id,user_id,message,plan_json,status,created_at,expires_at) VALUES(?,?,?,?,?,?,?)"
   ).bind(
-    id,
-    u.id,
-    msg,
-    JSON.stringify(p),
-    "pending",
-    Date.now(),
-    expires
+    id,u.id,msg,JSON.stringify(p),"pending",Date.now(),expires
   ).run();
 
-  await audit(
-    env,
-    u,
-    "board_plan",
-    JSON.stringify({
-      taskId:id,
-      kind:p.kind
-    })
-  );
+  await audit(env,u,"board_plan",id);
 
   return json({
     stage:"planned",
     taskId:id,
-
-    reply:
-      "קיבלתי את המשימה והכנתי תוכנית. עדיין לא בוצע שום שינוי. אם אתה רוצה לבצע את הפעולה, כתוב: אישור",
-
+    reply:"הכנתי תוכנית. עדיין לא בוצע שינוי. כדי לאשר, כתוב: אישור",
     action:"preview_change",
     needsApproval:true,
-
-    plan:{
-      steps:p.steps
-    },
-
+    plan:{steps:p.steps},
     expiresAt:expires
   });
 }
 
-export default{
+async function health(env){
+  const checks={database:false,assets:false};
+
+  try{
+    await env.DB.prepare("SELECT 1 AS ok").first();
+    checks.database=true;
+  }catch{}
+
+  checks.assets=!!env.ASSETS;
+
+  return json({
+    ok:checks.database,
+    service:"karnei-shomron",
+    checks
+  },checks.database?200:503);
+}
+
+export default {
   async fetch(req,env){
-
-    const u=await user(env,req);
     const url=new URL(req.url);
+    const path=url.pathname.replace(/\/+$/,"")||"/";
+    const method=req.method.toUpperCase();
 
-
-    /* CORS */
-
-    if(req.method==="OPTIONS"){
-
+    if(method==="OPTIONS"){
       return new Response(null,{
         status:204,
-
         headers:{
-          "access-control-allow-origin":"*",
-          "access-control-allow-methods":
-            "GET,POST,PATCH,DELETE,OPTIONS",
-          "access-control-allow-headers":
-            "Content-Type,Authorization"
+          ...H,
+          "access-control-allow-origin":url.origin,
+          "access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS",
+          "access-control-allow-headers":"Content-Type,Authorization",
+          "access-control-max-age":"86400"
         }
       });
     }
 
-
-    /* Health */
-
-    if(url.pathname==="/api/health")
-      return json({
-        status:"ok",
-        platform:"cloudflare",
-        twoAI:true
-      });
-
-
-    /* Login */
-
-    if(
-      url.pathname==="/api/admin/login"&&
-      req.method==="POST"
-    )
-      return adminLogin(req,env);
-
-
-    /* Current user */
-
-    if(
-      url.pathname==="/api/auth/me"&&
-      req.method==="GET"
-    )
-      return authMe(req,env);
-
-
-    /* Admin users */
-
-    if(
-      url.pathname==="/api/admin/users"&&
-      req.method==="GET"
-    )
-      return adminUsers(req,env,u);
-
-
-    if(
-      url.pathname.startsWith("/api/admin/users/")&&
-      req.method==="PATCH"
-    )
-      return adminUserPatch(
-        req,
-        env,
-        u,
-        decodeURIComponent(
-          url.pathname.slice(
-            "/api/admin/users/".length
-          )
-        )
-      );
-
-
-    /* Posts */
-
-    if(
-      url.pathname==="/api/posts"||
-      url.pathname.startsWith("/api/posts/")
-    )
-      return postsApi(
-        req,
-        env,
-        u,
-        url
-      );
-
-
-    /* Technical AI */
-
-    if(
-      url.pathname==="/api/ai/tech/diagnose"&&
-      req.method==="POST"
-    )
-      return techDiagnose(
-        req,
-        env,
-        u
-      );
-
-
-    if(
-      url.pathname==="/api/ai/tech"&&
-      req.method==="POST"
-    )
-      return techAsk(
-        req,
-        env,
-        u
-      );
-
-
-    /* Developer AI */
-
-    if(
-      url.pathname==="/api/ai/developer"&&
-      req.method==="POST"
-    )
-      return developerAi(
-        req,
-        env,
-        u
-      );
-
-
-    /* Public service AI */
-
-    if(
-      url.pathname==="/api/ai/service"&&
-      req.method==="POST"
-    )
-      return publicServiceAi(
-        req,
-        env
-      );
-
-
-    /* Owner AI */
-
-    if(
-      url.pathname==="/api/ai/owner"&&
-      req.method==="POST"
-    )
-      return ownerAi(
-        req,
-        env,
-        u
-      );
-
-
-    /* BOARD */
-
-    if(
-      url.pathname==="/api/ai/board"&&
-      req.method==="POST"
-    )
-      return board(
-        req,
-        env,
-        u
-      );
-
-
-    /* Config */
-
-    if(
-      url.pathname==="/api/config"&&
-      req.method==="PATCH"
-    ){
-
-      if(
-        !u||
-        u.role!=="super_admin"
-      )
-        return fail(
-          "אין הרשאה",
-          403
-        );
-
-      const b=await body(req);
-
-      const ann=String(
-        b.ann||""
-      ).trim().slice(0,300);
-
-      const wa=String(
-        b.wa||""
-      ).replace(/[^\d+]/g,"").slice(0,20);
-
-      await env.DB.prepare(
-        "INSERT INTO settings(key,value) VALUES('ann',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value"
-      ).bind(
-        ann
-      ).run();
-
-      if(wa){
-
-        await env.DB.prepare(
-          "INSERT INTO settings(key,value) VALUES('wa',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value"
-        ).bind(
-          wa
-        ).run();
+    try{
+      if(path==="/api/health"&&method==="GET"){
+        return await health(env);
       }
 
-      await audit(
-        env,
-        u,
-        "settings_update",
-        JSON.stringify({
-          ann,
-          wa:!!wa
-        })
-      );
+      if(path==="/api/admin/login"&&method==="POST"){
+        return await adminLogin(req,env);
+      }
 
-      return json({
-        ok:true
-      });
-    }
+      if(path==="/api/auth/me"&&method==="GET"){
+        return await authMe(req,env);
+      }
 
+      const u=await user(env,req);
 
-    /* Config GET */
+      if(path==="/api/admin/users"&&method==="GET"){
+        return await adminUsers(req,env,u);
+      }
 
-    if(
-      url.pathname==="/api/config"&&
-      req.method==="GET"
-    ){
+      const userMatch=path.match(/^\/api\/admin\/users\/([^/]+)$/);
 
-      const {results}=await env.DB.prepare(
-        "SELECT name,icon,color FROM categories ORDER BY rowid"
-      ).all();
+      if(userMatch&&method==="PATCH"){
+        return await adminUserPatch(
+          req,env,u,decodeURIComponent(userMatch[1])
+        );
+      }
 
-      const ann=await env.DB.prepare(
-        "SELECT value FROM settings WHERE key='ann'"
-      ).first();
+      if(path==="/api/posts"){
+        return await postsApi(req,env,u,url);
+      }
 
-      const wa=await env.DB.prepare(
-        "SELECT value FROM settings WHERE key='wa'"
-      ).first();
+      if(path.startsWith("/api/posts/")){
+        return await postsApi(req,env,u,url);
+      }
 
-      return json({
-        settings:{
-          categories:results||[],
-          ann:ann?.value||"",
-          wa:wa?.value||""
+      if(path==="/api/ai/tech/diagnose"&&method==="POST"){
+        return await techDiagnose(req,env,u);
+      }
+
+      if(path==="/api/ai/tech"&&method==="POST"){
+        return await techAsk(req,env,u);
+      }
+
+      if(path==="/api/ai/developer"&&method==="POST"){
+        return await developerAi(req,env,u);
+      }
+
+      if(path==="/api/ai/service"&&method==="POST"){
+        return await publicServiceAi(req,env);
+      }
+
+      if(path==="/api/ai/owner"&&method==="POST"){
+        return await ownerAi(req,env,u);
+      }
+
+      if(
+        (path==="/api/ai/board"||path==="/api/board/message")&&
+        method==="POST"
+      ){
+        return await board(req,env,u);
+      }
+
+      if(path==="/api/board/tasks"&&method==="GET"){
+        if(!u||u.role!=="super_admin")
+          return fail("אין הרשאה",403);
+
+        const {results}=await env.DB.prepare(
+          "SELECT id,message,status,created_at,expires_at FROM board_tasks WHERE user_id=? ORDER BY created_at DESC LIMIT 50"
+        ).bind(u.id).all();
+
+        return json({tasks:results||[]});
+      }
+
+      if(path==="/api/config"&&method==="GET"){
+        const rows=await env.DB.prepare(
+          "SELECT key,value FROM settings"
+        ).all();
+
+        const config={};
+        for(const r of rows.results||[]){
+          config[r.key]=r.value;
         }
-      });
+
+        return json({config});
+      }
+
+      if(path==="/api/config"&&method==="PATCH"){
+        if(!u||!MANAGERS.includes(u.role))
+          return fail("אין הרשאה",403);
+
+        const b=await body(req);
+
+        if(typeof b.shop_free==="boolean"){
+          await env.DB.prepare(
+            "INSERT INTO settings(key,value) VALUES('shop_free',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value"
+          ).bind(b.shop_free?"1":"0").run();
+        }
+
+        await audit(env,u,"config_update","site settings");
+
+        return json({ok:true});
+      }
+
+      if(path.startsWith("/api/")){
+        return fail("נתיב API לא נמצא",404);
+      }
+
+      if(env.ASSETS){
+        const assetUrl=new URL(req.url);
+
+        if(path==="/"){
+          assetUrl.pathname="/index.html";
+        }
+
+        return env.ASSETS.fetch(
+          new Request(assetUrl,req)
+        );
+      }
+
+      return fail("האתר לא הוגדר",503);
+
+    }catch(e){
+      console.error("Worker error:",e);
+
+      return json({
+        error:"שגיאה פנימית בשרת",
+        path
+      },500);
     }
-
-
-    /* Static files */
-
-    const r=await env.ASSETS.fetch(req);
-
-    return r.status===404&&url.pathname==="/"
-      ?env.ASSETS.fetch(
-        new Request(
-          new URL(
-            "/index.html",
-            req.url
-          )
-        )
-      )
-      :r;
   }
-}
+};
