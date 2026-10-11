@@ -11,11 +11,6 @@ binding = "DB"
 database_name = "karnei-shomron"
 database_id = "ccef00ff-320d-4514-a517-dbce74c1fcb0"
 migrations_dir = "migrations"
-
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "karnei-shomron-images"
-
 [vars]
 GITHUB_OWNER = "REPLACE_WITH_GITHUB_OWNER"
 GITHUB_REPO = "REPLACE_WITH_GITHUB_REPO"
